@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>포켓 문화재 가이드 - UI/UX 프로토타입</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        /* ===== 디자인 시스템 변수 ===== */
+        :root {
+            /* 색상 팔레트 - 한국 전통색 */
+            --color-dancheong-red: #D03A29;
+            --color-celadon-green: #7BA098;
+            --color-ink-black: #1A1A1A;
+            --color-hanji-beige: #F5E6D3;
+            --color-obang-blue: #2B4C8C;
+            --color-baekja-white: #FAFAFA;
+            --color-gray-light: #E5E5E5;
+            --color-gray-medium: #999999;
+            --color-gray-dark: #666666;
+            
+            /* 그림자 */
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 20px rgba(0,0,0,0.15);
+            
+            /* 간격 */
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+            
+            /* 둥근 모서리 */
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 16px;
+            --radius-full: 9999px;
+            
+            /* 폰트 */
+            --font-serif: 'Noto Serif KR', serif;
+            --font-sans: 'Noto Sans KR', sans-serif;
+            --font-inter: 'Inter', sans-serif;
+        }
+        
+        /* ===== 기본 스타일 ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: var(--font-sans);
+            color: var(--color-ink-black);
+            background: var(--color-hanji-beige);
+            line-height: 1.6;
+        }
+        
+        /* ===== 공통 컴포넌트 ===== */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--spacing-lg);
+        }
+        
+        .screen-mockup {
+            width: 375px;
+            height: 812px;
+            background: white;
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            margin: var(--spacing-xl) auto;
+            position: relative;
+        }
+        
+        .status-bar {
+            height: 44px;
+            background: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 var(--spacing-md);
+            font-size: 14px;
+            border-bottom: 1px solid var(--color-gray-light);
+        }
+        
+        .app-bar {
+            height: 56px;
+            background: white;
+            display: flex;
+            align-items: center;
+            padding: 0 var(--spacing-md);
+            border-bottom: 1px solid var(--color-gray-light);
+        }
+        
+        .app-bar-title {
+            font-family: var(--font-serif);
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--color-ink-black);
+            flex: 1;
+        }
+        
+        .icon-button {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .icon-button:hover {
+            background: var(--color-gray-light);
+        }
+        
+        .primary-button {
+            background: var(--color-dancheong-red);
+            color: white;
+            border: none;
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-radius: var(--radius-md);
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+        
+        .primary-button:hover {
+            background: #B53325;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            padding: var(--spacing-xs) var(--spacing-md);
+            background: white;
+            border: 1px solid var(--color-gray-light);
+            border-radius: var(--radius-full);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .chip.active {
+            background: var(--color-obang-blue);
+            color: white;
+            border-color: var(--color-obang-blue);
+        }
+        
+        .heritage-card {
+            background: white;
+            border: 1px solid var(--color-gray-light);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            margin: var(--spacing-md);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .heritage-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--color-celadon-green);
+        }
+        
+        .heritage-card-image {
+            width: 100%;
+            height: 120px;
+            background: linear-gradient(135deg, var(--color-celadon-green), var(--color-obang-blue));
+            position: relative;
+        }
+        
+        .heritage-card-content {
+            padding: var(--spacing-md);
+        }
+        
+        .heritage-card-title {
+            font-family: var(--font-serif);
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .heritage-card-category {
+            display: inline-block;
+            padding: 2px 8px;
+            background: var(--color-hanji-beige);
+            color: var(--color-gray-dark);
+            font-size: 12px;
+            border-radius: var(--radius-sm);
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .heritage-card-distance {
+            color: var(--color-gray-medium);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+        
+        /* ===== 화면별 스타일 ===== */
+        .home-screen {
+            position: relative;
+            height: calc(100% - 100px);
+        }
+        
+        .map-container {
+            height: 60%;
+            background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .map-placeholder {
+            text-align: center;
+            color: var(--color-gray-medium);
+        }
+        
+        .map-marker {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: var(--color-dancheong-red);
+            border-radius: var(--radius-full) var(--radius-full) var(--radius-full) 0;
+            transform: rotate(-45deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .map-marker-inner {
+            transform: rotate(45deg);
+            color: white;
+        }
+        
+        .bottom-sheet {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+            box-shadow: var(--shadow-lg);
+            height: 45%;
+            overflow-y: auto;
+        }
+        
+        .bottom-sheet-handle {
+            width: 40px;
+            height: 4px;
+            background: var(--color-gray-light);
+            border-radius: var(--radius-full);
+            margin: var(--spacing-sm) auto;
+        }
+        
+        .fab {
+            position: absolute;
+            bottom: 50%;
+            right: var(--spacing-md);
+            width: 56px;
+            height: 56px;
+            background: var(--color-dancheong-red);
+            color: white;
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-lg);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .fab:hover {
+            transform: scale(1.1);
+        }
+        
+        .detail-screen {
+            height: calc(100% - 100px);
+            overflow-y: auto;
+        }
+        
+        .detail-image-carousel {
+            height: 250px;
+            background: linear-gradient(135deg, var(--color-obang-blue), var(--color-celadon-green));
+            position: relative;
+        }
+        
+        .detail-content {
+            padding: var(--spacing-lg);
+        }
+        
+        .detail-title {
+            font-family: var(--font-serif);
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .detail-meta {
+            display: flex;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+            flex-wrap: wrap;
+        }
+        
+        .detail-meta-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            color: var(--color-gray-dark);
+            font-size: 14px;
+        }
+        
+        .detail-description {
+            line-height: 1.8;
+            color: var(--color-gray-dark);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .theme-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-md);
+            padding: var(--spacing-md);
+        }
+        
+        .theme-card {
+            background: white;
+            border: 1px solid var(--color-gray-light);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .theme-card:hover {
+            border-color: var(--color-celadon-green);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .theme-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--color-hanji-beige);
+            border-radius: var(--radius-full);
+            margin: 0 auto var(--spacing-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+        
+        .theme-title {
+            font-family: var(--font-serif);
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .theme-count {
+            color: var(--color-gray-medium);
+            font-size: 12px;
+        }
+        
+        .settings-section {
+            padding: var(--spacing-lg);
+            border-bottom: 1px solid var(--color-gray-light);
+        }
+        
+        .settings-title {
+            font-size: 14px;
+            color: var(--color-gray-medium);
+            margin-bottom: var(--spacing-md);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .settings-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-md) 0;
+        }
+        
+        .settings-label {
+            font-size: 16px;
+        }
+        
+        .language-selector {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+        
+        .language-option {
+            padding: var(--spacing-xs) var(--spacing-md);
+            background: white;
+            border: 1px solid var(--color-gray-light);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .language-option.active {
+            background: var(--color-obang-blue);
+            color: white;
+            border-color: var(--color-obang-blue);
+        }
+        
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+        
+        .slider {
+            width: 150px;
+            height: 4px;
+            background: var(--color-gray-light);
+            border-radius: var(--radius-full);
+            position: relative;
+        }
+        
+        .slider-fill {
+            height: 100%;
+            width: 60%;
+            background: var(--color-celadon-green);
+            border-radius: var(--radius-full);
+        }
+        
+        .slider-thumb {
+            position: absolute;
+            top: -8px;
+            left: 60%;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border: 2px solid var(--color-celadon-green);
+            border-radius: var(--radius-full);
+            cursor: pointer;
+        }
+        
+        /* ===== 애니메이션 ===== */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .animate-pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        /* ===== 반응형 ===== */
+        @media (max-width: 768px) {
+            .container {
+                padding: var(--spacing-md);
+            }
+            
+            .screen-mockup {
+                width: 100%;
+                max-width: 375px;
+                margin: var(--spacing-md) auto;
+            }
+        }
+        
+        /* ===== 다크모드 ===== */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --color-ink-black: #FAFAFA;
+                --color-baekja-white: #1A1A1A;
+                --color-hanji-beige: #2A2A2A;
+                --color-gray-light: #333333;
+                --color-gray-medium: #999999;
+                --color-gray-dark: #CCCCCC;
+            }
+            
+            body {
+                background: #0A0A0A;
+            }
+            
+            .screen-mockup {
+                background: #1A1A1A;
+            }
+            
+            .status-bar, .app-bar {
+                background: #1A1A1A;
+                border-color: #333333;
+            }
+            
+            .heritage-card, .theme-card {
+                background: #1A1A1A;
+                border-color: #333333;
+            }
+            
+            .bottom-sheet {
+                background: #1A1A1A;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 style="text-align: center; font-family: var(--font-serif); font-size: 36px; margin-bottom: var(--spacing-md);">
+            포켓 문화재 가이드 UI/UX 프로토타입
+        </h1>
+        <p style="text-align: center; color: var(--color-gray-medium); margin-bottom: var(--spacing-xl);">
+            한국 전통 미학과 현대적 UI의 조화를 추구한 디자인 시스템
+        </p>
+        
+        <!-- 색상 팔레트 -->
+        <div style="background: white; padding: var(--spacing-xl); border-radius: var(--radius-lg); margin-bottom: var(--spacing-xl);">
+            <h2 style="font-family: var(--font-serif); font-size: 24px; margin-bottom: var(--spacing-lg);">색상 팔레트</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--spacing-md);">
+                <div>
+                    <div style="width: 100%; height: 80px; background: var(--color-dancheong-red); border-radius: var(--radius-md);"></div>
+                    <p style="margin-top: var(--spacing-sm); font-size: 14px;">단청 적색</p>
+                    <code style="color: var(--color-gray-medium); font-size: 12px;">#D03A29</code>
+                </div>
+                <div>
+                    <div style="width: 100%; height: 80px; background: var(--color-celadon-green); border-radius: var(--radius-md);"></div>
+                    <p style="margin-top: var(--spacing-sm); font-size: 14px;">청자 녹색</p>
+                    <code style="color: var(--color-gray-medium); font-size: 12px;">#7BA098</code>
+                </div>
+                <div>
+                    <div style="width: 100%; height: 80px; background: var(--color-obang-blue); border-radius: var(--radius-md);"></div>
+                    <p style="margin-top: var(--spacing-sm); font-size: 14px;">오방색 청색</p>
+                    <code style="color: var(--color-gray-medium); font-size: 12px;">#2B4C8C</code>
+                </div>
+                <div>
+                    <div style="width: 100%; height: 80px; background: var(--color-hanji-beige); border-radius: var(--radius-md); border: 1px solid var(--color-gray-light);"></div>
+                    <p style="margin-top: var(--spacing-sm); font-size: 14px;">한지 베이지</p>
+                    <code style="color: var(--color-gray-medium); font-size: 12px;">#F5E6D3</code>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 화면 프로토타입들 -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(375px, 1fr)); gap: var(--spacing-xl); justify-items: center;">
+            
+            <!-- 0. 언어 선택 화면 (온보딩) -->
+            <div>
+                <h3 style="text-align: center; font-family: var(--font-serif); margin-bottom: var(--spacing-md);">언어 선택 화면 (첫 실행)</h3>
+                <div class="screen-mockup">
+                    <div class="status-bar">
+                        <span>9:41</span>
+                        <span style="display: flex; gap: 4px;">
+                            <span class="material-icons" style="font-size: 16px;">signal_cellular_alt</span>
+                            <span class="material-icons" style="font-size: 16px;">wifi</span>
+                            <span class="material-icons" style="font-size: 16px;">battery_full</span>
+                        </span>
+                    </div>
+                    
+                    <div style="height: calc(100% - 44px); background: linear-gradient(180deg, var(--color-hanji-beige) 0%, white 100%); position: relative; overflow: hidden;">
+                        <!-- 한지 텍스처 배경 효과 -->
+                        <div style="position: absolute; width: 100%; height: 100%; opacity: 0.1; background-image: repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(139, 69, 19, 0.1) 35px, rgba(139, 69, 19, 0.1) 70px), repeating-linear-gradient(-45deg, transparent, transparent 35px, rgba(139, 69, 19, 0.05) 35px, rgba(139, 69, 19, 0.05) 70px);"></div>
+                        
+                        <!-- 전통 문양 장식 -->
+                        <div style="position: absolute; top: 60px; left: 50%; transform: translateX(-50%); width: 80px; height: 80px; border: 3px solid var(--color-dancheong-red); border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center;">
+                            <div style="width: 60px; height: 60px; border: 2px solid var(--color-celadon-green); border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center;">
+                                <div style="width: 40px; height: 40px; background: var(--color-obang-blue); border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; color: white; font-size: 20px;">
+                                    🏛️
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 앱 타이틀 -->
+                        <div style="margin-top: 160px; text-align: center; padding: 0 var(--spacing-lg);">
+                            <h1 style="font-family: var(--font-serif); font-size: 28px; font-weight: 700; color: var(--color-ink-black); margin-bottom: var(--spacing-sm);">
+                                포켓 문화재 가이드
+                            </h1>
+                            <p style="font-size: 14px; color: var(--color-gray-medium); margin-bottom: var(--spacing-xl);">
+                                K-Heritage Explorer
+                            </p>
+                        </div>
+                        
+                        <!-- 언어 선택 카드들 -->
+                        <div style="padding: 0 var(--spacing-lg); margin-top: var(--spacing-lg);">
+                            
+                            <!-- 한국어 카드 -->
+                            <div class="language-card animate-fade-in" style="background: white; border: 2px solid transparent; border-radius: var(--radius-lg); padding: var(--spacing-md); margin-bottom: var(--spacing-md); cursor: pointer; transition: all 0.3s; box-shadow: var(--shadow-sm); position: relative; overflow: hidden;">
+                                <div style="position: absolute; top: 0; right: 0; width: 60px; height: 60px; background: linear-gradient(135deg, var(--color-dancheong-red) 0%, transparent 70%); opacity: 0.1;"></div>
+                                <div style="display: flex; align-items: center; gap: var(--spacing-md);">
+                                    <div style="width: 48px; height: 48px; background: var(--color-hanji-beige); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 24px;">
+                                        🇰🇷
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 2px;">한국어</h3>
+                                        <p style="font-size: 13px; color: var(--color-gray-medium);">한국의 소중한 문화유산을 만나보세요</p>
+                                    </div>
+                                    <span class="material-icons" style="color: var(--color-gray-light);">arrow_forward</span>
+                                </div>
+                            </div>
+                            
+                            <!-- English 카드 -->
+                            <div class="language-card animate-fade-in" style="background: white; border: 2px solid transparent; border-radius: var(--radius-lg); padding: var(--spacing-md); margin-bottom: var(--spacing-md); cursor: pointer; transition: all 0.3s; box-shadow: var(--shadow-sm); animation-delay: 0.1s; position: relative; overflow: hidden;">
+                                <div style="position: absolute; top: 0; right: 0; width: 60px; height: 60px; background: linear-gradient(135deg, var(--color-obang-blue) 0%, transparent 70%); opacity: 0.1;"></div>
+                                <div style="display: flex; align-items: center; gap: var(--spacing-md);">
+                                    <div style="width: 48px; height: 48px; background: var(--color-hanji-beige); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 24px;">
+                                        🇬🇧
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 2px;">English</h3>
+                                        <p style="font-size: 13px; color: var(--color-gray-medium);">Discover Korea's precious cultural heritage</p>
+                                    </div>
+                                    <span class="material-icons" style="color: var(--color-gray-light);">arrow_forward</span>
+                                </div>
+                            </div>
+                            
+                            <!-- 中文 카드 -->
+                            <div class="language-card animate-fade-in" style="background: white; border: 2px solid transparent; border-radius: var(--radius-lg); padding: var(--spacing-md); margin-bottom: var(--spacing-md); cursor: pointer; transition: all 0.3s; box-shadow: var(--shadow-sm); animation-delay: 0.2s; position: relative; overflow: hidden;">
+                                <div style="position: absolute; top: 0; right: 0; width: 60px; height: 60px; background: linear-gradient(135deg, var(--color-celadon-green) 0%, transparent 70%); opacity: 0.1;"></div>
+                                <div style="display: flex; align-items: center; gap: var(--spacing-md);">
+                                    <div style="width: 48px; height: 48px; background: var(--color-hanji-beige); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 24px;">
+                                        🇨🇳
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 2px;">中文</h3>
+                                        <p style="font-size: 13px; color: var(--color-gray-medium);">探索韩国珍贵的文化遗产</p>
+                                    </div>
+                                    <span class="material-icons" style="color: var(--color-gray-light);">arrow_forward</span>
+                                </div>
+                            </div>
+                            
+                            <!-- 日本語 카드 -->
+                            <div class="language-card animate-fade-in" style="background: white; border: 2px solid transparent; border-radius: var(--radius-lg); padding: var(--spacing-md); margin-bottom: var(--spacing-md); cursor: pointer; transition: all 0.3s; box-shadow: var(--shadow-sm); animation-delay: 0.3s; position: relative; overflow: hidden;">
+                                <div style="position: absolute; top: 0; right: 0; width: 60px; height: 60px; background: linear-gradient(135deg, #E91E63 0%, transparent 70%); opacity: 0.1;"></div>
+                                <div style="display: flex; align-items: center; gap: var(--spacing-md);">
+                                    <div style="width: 48px; height: 48px; background: var(--color-hanji-beige); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 24px;">
+                                        🇯🇵
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 2px;">日本語</h3>
+                                        <p style="font-size: 13px; color: var(--color-gray-medium);">韓国の貴重な文化遺産を発見</p>
+                                    </div>
+                                    <span class="material-icons" style="color: var(--color-gray-light);">arrow_forward</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 시작 버튼 (언어 선택 후 활성화) -->
+                        <div style="position: absolute; bottom: 40px; left: var(--spacing-lg); right: var(--spacing-lg);">
+                            <button class="primary-button" style="width: 100%; justify-content: center; background: var(--color-gray-light); cursor: not-allowed; opacity: 0.5;" disabled>
+                                <span>언어를 선택해주세요</span>
+                            </button>
+                        </div>
+                        
+                        <!-- 하단 장식 패턴 -->
+                        <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 120px; background: linear-gradient(180deg, transparent 0%, rgba(123, 160, 152, 0.05) 100%);"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 1. 홈 화면 -->
+            <div>
+                <h3 style="text-align: center; font-family: var(--font-serif); margin-bottom: var(--spacing-md);">홈 화면 (지도 + 리스트)</h3>
+                <div class="screen-mockup">
+                    <div class="status-bar">
+                        <span>9:41</span>
+                        <span style="display: flex; gap: 4px;">
+                            <span class="material-icons" style="font-size: 16px;">signal_cellular_alt</span>
+                            <span class="material-icons" style="font-size: 16px;">wifi</span>
+                            <span class="material-icons" style="font-size: 16px;">battery_full</span>
+                        </span>
+                    </div>
+                    
+                    <div class="app-bar">
+                        <h1 class="app-bar-title">주변 문화재</h1>
+                        <button class="icon-button">
+                            <span class="material-icons">search</span>
+                        </button>
+                        <button class="icon-button">
+                            <span class="material-icons">translate</span>
+                        </button>
+                    </div>
+                    
+                    <div class="home-screen">
+                        <div class="map-container">
+                            <div class="map-placeholder">
+                                <span class="material-icons" style="font-size: 48px; color: var(--color-gray-light);">map</span>
+                                <p>지도 영역</p>
+                            </div>
+                            <div class="map-marker" style="top: 30%; left: 40%;">
+                                <span class="map-marker-inner material-icons">location_on</span>
+                            </div>
+                            <div class="map-marker" style="top: 50%; left: 60%;">
+                                <span class="map-marker-inner material-icons">location_on</span>
+                            </div>
+                            <div class="map-marker" style="top: 70%; left: 35%;">
+                                <span class="map-marker-inner material-icons">location_on</span>
+                            </div>
+                        </div>
+                        
+                        <div class="fab animate-pulse">
+                            <span class="material-icons">my_location</span>
+                        </div>
+                        
+                        <div class="bottom-sheet">
+                            <div class="bottom-sheet-handle"></div>
+                            <div style="padding: var(--spacing-md); display: flex; gap: var(--spacing-sm); overflow-x: auto;">
+                                <span class="chip active">전체</span>
+                                <span class="chip">국보</span>
+                                <span class="chip">보물</span>
+                                <span class="chip">사적</span>
+                                <span class="chip">명승</span>
+                            </div>
+                            
+                            <div class="heritage-card animate-fade-in">
+                                <div class="heritage-card-image"></div>
+                                <div class="heritage-card-content">
+                                    <span class="heritage-card-category">국보</span>
+                                    <h3 class="heritage-card-title">숭례문</h3>
+                                    <div class="heritage-card-distance">
+                                        <span class="material-icons" style="font-size: 16px;">place</span>
+                                        <span>0.8km</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="heritage-card animate-fade-in" style="animation-delay: 0.1s;">
+                                <div class="heritage-card-image"></div>
+                                <div class="heritage-card-content">
+                                    <span class="heritage-card-category">보물</span>
+                                    <h3 class="heritage-card-title">덕수궁 중화전</h3>
+                                    <div class="heritage-card-distance">
+                                        <span class="material-icons" style="font-size: 16px;">place</span>
+                                        <span>1.2km</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 2. 상세 화면 -->
+            <div>
+                <h3 style="text-align: center; font-family: var(--font-serif); margin-bottom: var(--spacing-md);">상세 화면</h3>
+                <div class="screen-mockup">
+                    <div class="status-bar">
+                        <span>9:41</span>
+                        <span style="display: flex; gap: 4px;">
+                            <span class="material-icons" style="font-size: 16px;">signal_cellular_alt</span>
+                            <span class="material-icons" style="font-size: 16px;">wifi</span>
+                            <span class="material-icons" style="font-size: 16px;">battery_full</span>
+                        </span>
+                    </div>
+                    
+                    <div class="app-bar">
+                        <button class="icon-button">
+                            <span class="material-icons">arrow_back</span>
+                        </button>
+                        <h1 class="app-bar-title">문화재 상세</h1>
+                        <button class="icon-button">
+                            <span class="material-icons">share</span>
+                        </button>
+                        <button class="icon-button">
+                            <span class="material-icons">bookmark_border</span>
+                        </button>
+                    </div>
+                    
+                    <div class="detail-screen">
+                        <div class="detail-image-carousel">
+                            <div style="position: absolute; bottom: var(--spacing-md); right: var(--spacing-md); background: rgba(0,0,0,0.5); color: white; padding: 4px 12px; border-radius: var(--radius-full); font-size: 12px;">
+                                1 / 5
+                            </div>
+                        </div>
+                        
+                        <div class="detail-content">
+                            <h1 class="detail-title">경복궁</h1>
+                            
+                            <div class="detail-meta">
+                                <div class="detail-meta-item">
+                                    <span class="material-icons" style="font-size: 18px;">category</span>
+                                    <span>사적 제117호</span>
+                                </div>
+                                <div class="detail-meta-item">
+                                    <span class="material-icons" style="font-size: 18px;">event</span>
+                                    <span>1395년 창건</span>
+                                </div>
+                                <div class="detail-meta-item">
+                                    <span class="material-icons" style="font-size: 18px;">place</span>
+                                    <span>서울 종로구</span>
+                                </div>
+                            </div>
+                            
+                            <p class="detail-description">
+                                경복궁은 조선왕조 제일의 법궁으로, 북으로 북악산을 기대어 자리 잡았습니다. 
+                                1395년 태조 이성계가 창건하였고, 1592년 임진왜란으로 불타 없어졌다가 
+                                고종 때인 1867년 중건되었습니다. 흥선대원군이 주도한 중건 공사는 
+                                경복궁을 다시 옛 모습으로 복원하는 대규모 사업이었습니다.
+                            </p>
+                            
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md);">
+                                <button class="primary-button" style="width: 100%; justify-content: center;">
+                                    <span class="material-icons">directions</span>
+                                    <span>길찾기</span>
+                                </button>
+                                <button class="primary-button" style="width: 100%; justify-content: center; background: var(--color-celadon-green);">
+                                    <span class="material-icons">volume_up</span>
+                                    <span>오디오 가이드</span>
+                                </button>
+                            </div>
+                            
+                            <div style="margin-top: var(--spacing-xl);">
+                                <h3 style="font-family: var(--font-serif); margin-bottom: var(--spacing-md);">관련 정보</h3>
+                                <div style="background: var(--color-hanji-beige); padding: var(--spacing-md); border-radius: var(--radius-md);">
+                                    <div style="display: flex; justify-content: space-between; padding: var(--spacing-sm) 0;">
+                                        <span>관람 시간</span>
+                                        <span style="font-weight: 500;">09:00 - 18:00</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; padding: var(--spacing-sm) 0;">
+                                        <span>입장료</span>
+                                        <span style="font-weight: 500;">성인 3,000원</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; padding: var(--spacing-sm) 0;">
+                                        <span>휴관일</span>
+                                        <span style="font-weight: 500;">매주 화요일</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 3. 테마 화면 -->
+            <div>
+                <h3 style="text-align: center; font-family: var(--font-serif); margin-bottom: var(--spacing-md);">테마 화면</h3>
+                <div class="screen-mockup">
+                    <div class="status-bar">
+                        <span>9:41</span>
+                        <span style="display: flex; gap: 4px;">
+                            <span class="material-icons" style="font-size: 16px;">signal_cellular_alt</span>
+                            <span class="material-icons" style="font-size: 16px;">wifi</span>
+                            <span class="material-icons" style="font-size: 16px;">battery_full</span>
+                        </span>
+                    </div>
+                    
+                    <div class="app-bar">
+                        <h1 class="app-bar-title">테마별 탐방</h1>
+                    </div>
+                    
+                    <div style="padding: var(--spacing-md);">
+                        <p style="color: var(--color-gray-medium); margin-bottom: var(--spacing-lg);">
+                            관심 있는 테마를 선택하여 문화재를 탐방해보세요
+                        </p>
+                        
+                        <div class="theme-grid">
+                            <div class="theme-card animate-fade-in">
+                                <div class="theme-icon">🏛️</div>
+                                <h3 class="theme-title">궁궐 탐방</h3>
+                                <p class="theme-count">5개 문화재</p>
+                            </div>
+                            
+                            <div class="theme-card animate-fade-in" style="animation-delay: 0.1s;">
+                                <div class="theme-icon">🌍</div>
+                                <h3 class="theme-title">세계유산</h3>
+                                <p class="theme-count">14개 문화재</p>
+                            </div>
+                            
+                            <div class="theme-card animate-fade-in" style="animation-delay: 0.2s;">
+                                <div class="theme-icon">🏘️</div>
+                                <h3 class="theme-title">전통마을</h3>
+                                <p class="theme-count">7개 문화재</p>
+                            </div>
+                            
+                            <div class="theme-card animate-fade-in" style="animation-delay: 0.3s;">
+                                <div class="theme-icon">🛕</div>
+                                <h3 class="theme-title">불교 문화재</h3>
+                                <p class="theme-count">23개 문화재</p>
+                            </div>
+                            
+                            <div class="theme-card animate-fade-in" style="animation-delay: 0.4s;">
+                                <div class="theme-icon">⛰️</div>
+                                <h3 class="theme-title">산성</h3>
+                                <p class="theme-count">9개 문화재</p>
+                            </div>
+                            
+                            <div class="theme-card animate-fade-in" style="animation-delay: 0.5s;">
+                                <div class="theme-icon">🎭</div>
+                                <h3 class="theme-title">무형문화재</h3>
+                                <p class="theme-count">15개 문화재</p>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: var(--spacing-xl); padding: var(--spacing-lg); background: var(--color-hanji-beige); border-radius: var(--radius-lg);">
+                            <h3 style="font-family: var(--font-serif); margin-bottom: var(--spacing-md);">이달의 추천 코스</h3>
+                            <div style="display: flex; align-items: center; gap: var(--spacing-md);">
+                                <div style="width: 60px; height: 60px; background: var(--color-dancheong-red); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px;">
+                                    🌸
+                                </div>
+                                <div style="flex: 1;">
+                                    <h4 style="font-weight: 600; margin-bottom: 4px;">봄꽃과 함께하는 궁궐 나들이</h4>
+                                    <p style="font-size: 14px; color: var(--color-gray-medium);">창덕궁, 창경궁, 덕수궁</p>
+                                </div>
+                                <span class="material-icons" style="color: var(--color-gray-medium);">arrow_forward</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 4. 설정 화면 -->
+            <div>
+                <h3 style="text-align: center; font-family: var(--font-serif); margin-bottom: var(--spacing-md);">설정 화면</h3>
+                <div class="screen-mockup">
+                    <div class="status-bar">
+                        <span>9:41</span>
+                        <span style="display: flex; gap: 4px;">
+                            <span class="material-icons" style="font-size: 16px;">signal_cellular_alt</span>
+                            <span class="material-icons" style="font-size: 16px;">wifi</span>
+                            <span class="material-icons" style="font-size: 16px;">battery_full</span>
+                        </span>
+                    </div>
+                    
+                    <div class="app-bar">
+                        <h1 class="app-bar-title">설정</h1>
+                    </div>
+                    
+                    <div>
+                        <div class="settings-section">
+                            <h3 class="settings-title">언어 설정</h3>
+                            <div class="settings-item">
+                                <span class="settings-label">앱 언어</span>
+                                <div class="language-selector">
+                                    <span class="language-option active">한국어</span>
+                                    <span class="language-option">English</span>
+                                    <span class="language-option">中文</span>
+                                    <span class="language-option">日本語</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-section">
+                            <h3 class="settings-title">탐색 설정</h3>
+                            <div class="settings-item">
+                                <span class="settings-label">탐색 반경</span>
+                                <div class="slider-container">
+                                    <div class="slider">
+                                        <div class="slider-fill"></div>
+                                        <div class="slider-thumb"></div>
+                                    </div>
+                                    <span style="font-weight: 500;">3km</span>
+                                </div>
+                            </div>
+                            <div class="settings-item">
+                                <span class="settings-label">오프라인 지도</span>
+                                <button style="padding: 6px 12px; background: var(--color-obang-blue); color: white; border: none; border-radius: var(--radius-md);">
+                                    다운로드
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-section">
+                            <h3 class="settings-title">알림 설정</h3>
+                            <div class="settings-item">
+                                <span class="settings-label">주변 문화재 알림</span>
+                                <div style="width: 48px; height: 28px; background: var(--color-celadon-green); border-radius: var(--radius-full); position: relative;">
+                                    <div style="position: absolute; right: 2px; top: 2px; width: 24px; height: 24px; background: white; border-radius: var(--radius-full);"></div>
+                                </div>
+                            </div>
+                            <div class="settings-item">
+                                <span class="settings-label">이벤트 알림</span>
+                                <div style="width: 48px; height: 28px; background: var(--color-gray-light); border-radius: var(--radius-full); position: relative;">
+                                    <div style="position: absolute; left: 2px; top: 2px; width: 24px; height: 24px; background: white; border-radius: var(--radius-full);"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-section">
+                            <h3 class="settings-title">앱 정보</h3>
+                            <div class="settings-item">
+                                <span class="settings-label">버전</span>
+                                <span style="color: var(--color-gray-medium);">1.0.0</span>
+                            </div>
+                            <div class="settings-item">
+                                <span class="settings-label">오픈소스 라이선스</span>
+                                <span class="material-icons" style="color: var(--color-gray-medium);">arrow_forward</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 인터랙션 가이드 -->
+        <div style="background: white; padding: var(--spacing-xl); border-radius: var(--radius-lg); margin-top: var(--spacing-xl);">
+            <h2 style="font-family: var(--font-serif); font-size: 24px; margin-bottom: var(--spacing-lg);">인터랙션 & 애니메이션</h2>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--spacing-xl);">
+                <div>
+                    <h3 style="font-size: 18px; margin-bottom: var(--spacing-md);">터치 피드백</h3>
+                    <ul style="line-height: 2; color: var(--color-gray-dark);">
+                        <li>카드 호버: 상승 효과 + 그림자</li>
+                        <li>버튼 클릭: 스케일 축소 후 복원</li>
+                        <li>칩 선택: 색상 전환 애니메이션</li>
+                        <li>리스트 스크롤: 관성 스크롤</li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 style="font-size: 18px; margin-bottom: var(--spacing-md);">화면 전환</h3>
+                    <ul style="line-height: 2; color: var(--color-gray-dark);">
+                        <li>페이지 이동: 슬라이드 인/아웃</li>
+                        <li>모달: 페이드 인 + 스케일</li>
+                        <li>하단 시트: 드래그 제스처</li>
+                        <li>이미지 로딩: 스켈레톤 → 페이드 인</li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 style="font-size: 18px; margin-bottom: var(--spacing-md);">마이크로 인터랙션</h3>
+                    <ul style="line-height: 2; color: var(--color-gray-dark);">
+                        <li>FAB 펄스: 주목도 향상</li>
+                        <li>마커 바운스: 선택 시 반응</li>
+                        <li>스위치 토글: 부드러운 전환</li>
+                        <li>로딩 스피너: 한국 전통 문양</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 접근성 가이드 -->
+        <div style="background: white; padding: var(--spacing-xl); border-radius: var(--radius-lg); margin-top: var(--spacing-xl);">
+            <h2 style="font-family: var(--font-serif); font-size: 24px; margin-bottom: var(--spacing-lg);">접근성 고려사항</h2>
+            
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-xl);">
+                <div>
+                    <h3 style="font-size: 18px; margin-bottom: var(--spacing-md);">시각적 접근성</h3>
+                    <ul style="line-height: 2; color: var(--color-gray-dark);">
+                        <li>WCAG AA 기준 색상 대비 (4.5:1 이상)</li>
+                        <li>최소 터치 영역 48x48dp</li>
+                        <li>폰트 크기 조절 지원</li>
+                        <li>다크 모드 완벽 지원</li>
+                        <li>아이콘과 텍스트 레이블 병행</li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 style="font-size: 18px; margin-bottom: var(--spacing-md);">스크린 리더 지원</h3>
+                    <ul style="line-height: 2; color: var(--color-gray-dark);">
+                        <li>의미 있는 대체 텍스트</li>
+                        <li>논리적인 포커스 순서</li>
+                        <li>역할 기반 시맨틱 마크업</li>
+                        <li>상태 변경 음성 안내</li>
+                        <li>제스처 대체 방법 제공</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Flutter 구현 예시 -->
+        <div style="background: white; padding: var(--spacing-xl); border-radius: var(--radius-lg); margin-top: var(--spacing-xl);">
+            <h2 style="font-family: var(--font-serif); font-size: 24px; margin-bottom: var(--spacing-lg);">Flutter 구현 코드 예시</h2>
+            
+            <pre style="background: #1E1E1E; color: #D4D4D4; padding: var(--spacing-lg); border-radius: var(--radius-md); overflow-x: auto;">
+<code>// 테마 정의
+class AppTheme {
+  static const Color dancheongRed = Color(0xFFD03A29);
+  static const Color celadonGreen = Color(0xFF7BA098);
+  static const Color obangBlue = Color(0xFF2B4C8C);
+  static const Color hanjiBeige = Color(0xFFF5E6D3);
+  
+  static ThemeData lightTheme = ThemeData(
+    primaryColor: dancheongRed,
+    scaffoldBackgroundColor: hanjiBeige,
+    fontFamily: 'NotoSansKR',
+    appBarTheme: AppBarTheme(
+      backgroundColor: Colors.white,
+      elevation: 0,
+      titleTextStyle: TextStyle(
+        fontFamily: 'NotoSerifKR',
+        fontSize: 20,
+        fontWeight: FontWeight.w700,
+        color: Color(0xFF1A1A1A),
+      ),
+    ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: dancheongRed,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        padding: EdgeInsets.symmetric(
+          horizontal: 24,
+          vertical: 16,
+        ),
+      ),
+    ),
+  );
+}
+
+// 커스텀 위젯 예시
+class HeritageCard extends StatelessWidget {
+  final Heritage heritage;
+  
+  const HeritageCard({required this.heritage});
+  
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey[300]!),
+      ),
+      child: InkWell(
+        onTap: () => _navigateToDetail(context),
+        borderRadius: BorderRadius.circular(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              height: 120,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(16),
+                ),
+                gradient: LinearGradient(
+                  colors: [
+                    AppTheme.celadonGreen,
+                    AppTheme.obangBlue,
+                  ],
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppTheme.hanjiBeige,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      heritage.category,
+                      style: TextStyle(fontSize: 12),
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    heritage.nameKo,
+                    style: TextStyle(
+                      fontFamily: 'NotoSerifKR',
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Icon(Icons.place, size: 16),
+                      SizedBox(width: 4),
+                      Text(
+                        '${heritage.distance}km',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}</code>
+            </pre>
+        </div>
+    </div>
+    
+    <script>
+        // 간단한 인터랙션 추가
+        document.querySelectorAll('.heritage-card').forEach(card => {
+            card.addEventListener('click', () => {
+                card.style.transform = 'scale(0.98)';
+                setTimeout(() => {
+                    card.style.transform = '';
+                }, 200);
+            });
+        });
+        
+        document.querySelectorAll('.chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+                chip.classList.add('active');
+            });
+        });
+        
+        document.querySelectorAll('.language-option').forEach(option => {
+            option.addEventListener('click', () => {
+                document.querySelectorAll('.language-option').forEach(o => o.classList.remove('active'));
+                option.classList.add('active');
+            });
+        });
+        
+        // 언어 선택 카드 인터랙션
+        document.querySelectorAll('.language-card').forEach(card => {
+            card.addEventListener('click', () => {
+                // 모든 카드의 선택 상태 초기화
+                document.querySelectorAll('.language-card').forEach(c => {
+                    c.style.border = '2px solid transparent';
+                    c.style.background = 'white';
+                });
+                
+                // 선택된 카드 강조
+                card.style.border = '2px solid var(--color-dancheong-red)';
+                card.style.background = 'linear-gradient(to right, rgba(208, 58, 41, 0.05), white)';
+                
+                // 시작 버튼 활성화
+                const startButton = card.closest('.screen-mockup').querySelector('.primary-button');
+                if (startButton) {
+                    startButton.disabled = false;
+                    startButton.style.background = 'var(--color-dancheong-red)';
+                    startButton.style.cursor = 'pointer';
+                    startButton.style.opacity = '1';
+                    
+                    // 버튼 텍스트 변경 (선택된 언어에 따라)
+                    const langTitle = card.querySelector('h3').textContent;
+                    let buttonText = '시작하기';
+                    if (langTitle === 'English') buttonText = 'Get Started';
+                    else if (langTitle === '中文') buttonText = '开始使用';
+                    else if (langTitle === '日本語') buttonText = 'はじめる';
+                    
+                    startButton.querySelector('span').textContent = buttonText;
+                }
+                
+                // 클릭 애니메이션
+                card.style.transform = 'scale(0.98)';
+                setTimeout(() => {
+                    card.style.transform = '';
+                }, 200);
+            });
+            
+            // 호버 효과
+            card.addEventListener('mouseenter', () => {
+                if (card.style.border !== '2px solid var(--color-dancheong-red)') {
+                    card.style.transform = 'translateY(-2px)';
+                    card.style.boxShadow = 'var(--shadow-md)';
+                }
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                if (card.style.border !== '2px solid var(--color-dancheong-red)') {
+                    card.style.transform = '';
+                    card.style.boxShadow = 'var(--shadow-sm)';
+                }
+            });
+        });
+        
+        // 슬라이더 인터랙션
+        const sliderThumb = document.querySelector('.slider-thumb');
+        if (sliderThumb) {
+            let isDragging = false;
+            
+            sliderThumb.addEventListener('mousedown', () => isDragging = true);
+            document.addEventListener('mouseup', () => isDragging = false);
+            document.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                // 실제 슬라이더 구현은 Flutter에서
+            });
+        }
+    </script>
+</body>
+</html>
