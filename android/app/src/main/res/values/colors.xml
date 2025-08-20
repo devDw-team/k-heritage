@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 앱 테마 색상 -->
+    <color name="primary">#D03A29</color>
+    <color name="primaryDark">#B53325</color>
+    <color name="accent">#7BA098</color>
+    <color name="background">#F5E6D3</color>
+    
+    <!-- Adaptive Icon 배경색 -->
+    <color name="ic_launcher_background">#F5E6D3</color>
+</resources>

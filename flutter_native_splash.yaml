@@ -1,0 +1,24 @@
+flutter_native_splash:
+  # 배경색 설정 (한지 베이지)
+  color: "#F5E6D3"
+  
+  # 스플래시 이미지 설정 (크기 증가)
+  image: assets/images/splash_center_large.png
+  
+  # 이미지 크기 조절 (Android에서 화면 전체 채우기)
+  android_12:
+    # Android 12+ 스플래시 설정
+    color: "#F5E6D3"
+    image: assets/images/splash_center_large.png
+    
+  # iOS 설정
+  ios: true
+  
+  # 웹 설정
+  web: true
+  
+  # 전체 화면 모드
+  fullscreen: true
+  
+  # iOS 상태바 설정
+  ios_content_mode: center

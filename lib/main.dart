@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'core/config/app_config.dart';
 import 'core/utils/logger.dart';
 import 'app/router/app_router.dart';
@@ -8,7 +9,10 @@ import 'app/theme/app_theme.dart';
 
 void main() async {
   // Initialize Flutter binding
-  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  
+  // Preserve native splash screen until app is ready
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   
   // Set preferred orientations (optional)
   await SystemChrome.setPreferredOrientations([
@@ -38,8 +42,14 @@ Future<void> _initializeApp() async {
     // Log successful initialization
     Log.i('App initialization completed successfully');
     Log.d('Configuration: ${AppConfig.instance.toMap()}');
+    
+    // Remove native splash screen (Flutter 커스텀 스플래시가 표시됨)
+    FlutterNativeSplash.remove();
   } catch (e, stackTrace) {
     Log.f('Failed to initialize app', error: e, stackTrace: stackTrace);
+    
+    // Remove splash screen even on error
+    FlutterNativeSplash.remove();
     
     // In production, you might want to show an error screen
     // For now, we'll rethrow to see the error during development

@@ -9,9 +9,11 @@ import '../../features/heritage/presentation/screens/theme_screen.dart';
 import '../../features/bookmarks/presentation/screens/bookmarks_screen.dart';
 import '../../features/settings/presentation/screens/settings_screen.dart';
 import '../../features/onboarding/presentation/screens/language_selection_screen.dart';
+import '../../features/splash/presentation/screens/splash_screen.dart';
 
 /// 라우트 이름 상수
 abstract class AppRoutes {
+  static const String splash = '/splash';
   static const String languageSelection = '/language-selection';
   static const String home = '/home';
   static const String themes = '/themes';
@@ -23,9 +25,16 @@ abstract class AppRoutes {
 /// 라우터 프로바이더
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
-    initialLocation: AppRoutes.home,
+    initialLocation: AppRoutes.splash,
     debugLogDiagnostics: true,
     routes: [
+      // 스플래시 화면
+      GoRoute(
+        path: AppRoutes.splash,
+        name: 'splash',
+        builder: (context, state) => const SplashScreen(),
+      ),
+      
       // 언어 선택 화면 (온보딩)
       GoRoute(
         path: AppRoutes.languageSelection,

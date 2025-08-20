@@ -1,0 +1,29 @@
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icons/app_icon.png"
+  
+  # Android 설정
+  adaptive_icon_background: "#F5E6D3"  # 한지 베이지 색상
+  adaptive_icon_foreground: "assets/icons/app_icon_foreground.png"
+  
+  # iOS 설정
+  remove_alpha_ios: true
+  
+  # 앱 이름 설정
+  web:
+    generate: true
+    image_path: "assets/icons/app_icon.png"
+    background_color: "#F5E6D3"
+    theme_color: "#D03A29"
+  
+  # Windows 설정
+  windows:
+    generate: true
+    image_path: "assets/icons/app_icon.png"
+    icon_size: 48
+  
+  # macOS 설정
+  macos:
+    generate: true
+    image_path: "assets/icons/app_icon.png"
