@@ -8,19 +8,32 @@ import '../../domain/entities/heritage.dart';
 
 /// 문화재 카드 위젯
 class HeritageCard extends StatelessWidget {
-  final Heritage heritage;
+  final Heritage? heritage;
+  final String? name;
+  final String? category;
+  final String? distance;
+  final String? imageUrl;
   final VoidCallback? onTap;
   final bool showDistance;
 
   const HeritageCard({
     super.key,
-    required this.heritage,
+    this.heritage,
+    this.name,
+    this.category,
+    this.distance,
+    this.imageUrl,
     this.onTap,
     this.showDistance = true,
   });
 
   @override
   Widget build(BuildContext context) {
+    final heritageName = name ?? heritage?.nameKo ?? '';
+    final heritageCategory = category ?? heritage?.category ?? '';
+    final heritageDistance = distance ?? (heritage?.distanceKm != null ? '${heritage?.distanceKm}km' : '');
+    final heritageAddress = heritage?.address ?? '';
+    
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -44,12 +57,14 @@ class HeritageCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // 카테고리 배지
-                  _buildCategoryBadge(),
-                  const SizedBox(height: 8),
+                  if (heritageCategory.isNotEmpty)
+                    _buildCategoryBadge(heritageCategory),
+                  if (heritageCategory.isNotEmpty)
+                    const SizedBox(height: 8),
                   
                   // 제목
                   Text(
-                    heritage.nameKo,
+                    heritageName,
                     style: AppTypography.h5,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -57,29 +72,30 @@ class HeritageCard extends StatelessWidget {
                   const SizedBox(height: 4),
                   
                   // 주소
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.location_on_outlined,
-                        size: 16,
-                        color: AppColors.grayMedium,
-                      ),
-                      const SizedBox(width: 4),
-                      Expanded(
-                        child: Text(
-                          heritage.address,
-                          style: AppTypography.bodySmall.copyWith(
-                            color: AppColors.grayMedium,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                  if (heritageAddress.isNotEmpty)
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.location_on_outlined,
+                          size: 16,
+                          color: AppColors.grayMedium,
                         ),
-                      ),
-                    ],
-                  ),
+                        const SizedBox(width: 4),
+                        Expanded(
+                          child: Text(
+                            heritageAddress,
+                            style: AppTypography.bodySmall.copyWith(
+                              color: AppColors.grayMedium,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
                   
                   // 거리 표시
-                  if (showDistance && heritage.distance != null) ...[
+                  if (showDistance && heritageDistance.isNotEmpty) ...[
                     const SizedBox(height: 4),
                     Row(
                       children: [
@@ -90,7 +106,7 @@ class HeritageCard extends StatelessWidget {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          '${heritage.distance}km',
+                          heritageDistance,
                           style: AppTypography.numberSmall.copyWith(
                             color: AppColors.grayMedium,
                           ),
@@ -108,6 +124,11 @@ class HeritageCard extends StatelessWidget {
   }
 
   Widget _buildImage() {
+    final heritageCategory = category ?? heritage?.category ?? '';
+    final hasImages = heritage?.images.isNotEmpty ?? false;
+    final displayImageUrl = imageUrl ?? 
+        (hasImages && heritage != null ? (heritage!.images.first.thumbnailUrl ?? heritage!.images.first.imageUrl) : null);
+    
     return Container(
       height: 120,
       decoration: BoxDecoration(
@@ -118,19 +139,18 @@ class HeritageCard extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            _getCategoryColor(heritage.category),
-            _getCategoryColor(heritage.category).withOpacity(0.7),
+            _getCategoryColor(heritageCategory),
+            _getCategoryColor(heritageCategory).withOpacity(0.7),
           ],
         ),
       ),
-      child: heritage.images.isNotEmpty
+      child: displayImageUrl != null
           ? ClipRRect(
               borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(AppTheme.radiusLg),
               ),
               child: CachedNetworkImage(
-                imageUrl: heritage.images.first.thumbnailUrl ??
-                    heritage.images.first.url,
+                imageUrl: displayImageUrl,
                 fit: BoxFit.cover,
                 placeholder: (context, url) => const Center(
                   child: CircularProgressIndicator(),
@@ -152,20 +172,20 @@ class HeritageCard extends StatelessWidget {
     );
   }
 
-  Widget _buildCategoryBadge() {
+  Widget _buildCategoryBadge(String categoryName) {
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: 8,
         vertical: 2,
       ),
       decoration: BoxDecoration(
-        color: _getCategoryColor(heritage.category).withOpacity(0.1),
+        color: _getCategoryColor(categoryName).withOpacity(0.1),
         borderRadius: BorderRadius.circular(AppTheme.radiusSm),
       ),
       child: Text(
-        heritage.category,
+        categoryName,
         style: AppTypography.labelSmall.copyWith(
-          color: _getCategoryColor(heritage.category),
+          color: _getCategoryColor(categoryName),
           fontWeight: FontWeight.w600,
         ),
       ),

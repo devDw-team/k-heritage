@@ -75,6 +75,12 @@ dependencies:
   
   # SVG Support
   flutter_svg: ^2.0.10
+  
+  # Permissions
+  permission_handler: ^11.3.0
+  
+  # XML Parsing for API
+  xml: ^6.5.0
 
 dev_dependencies:
   flutter_test:

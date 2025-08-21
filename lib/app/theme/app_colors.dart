@@ -39,6 +39,7 @@ class AppColors {
   static const Color treasure = obangBlue; // 보물
   static const Color historicSite = celadonGreen; // 사적
   static const Color scenicSite = Color(0xFF7B68EE); // 명승
+  static const Color naturalMonument = Color(0xFF4CAF50); // 천연기념물
   static const Color intangibleHeritage = Color(0xFFFF6B6B); // 무형문화재
 
   // 그라데이션

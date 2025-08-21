@@ -30,36 +30,43 @@ class _HeritageDetailScreenState extends ConsumerState<HeritageDetailScreen> {
   // 더미 데이터
   late final Heritage _heritage = const Heritage(
     id: '1',
+    kdcd: '13',  // 사적 코드
+    ctcd: '11',  // 서울시 코드
+    asno: '00117',  // 관리번호
     nameKo: '경복궁',
     nameEn: 'Gyeongbokgung Palace',
-    category: '사적 제117호',
+    category: '사적',
+    cityName: '서울특별시',
+    sigungu: '종로구',
     latitude: 37.5796,
     longitude: 126.9770,
     address: '서울특별시 종로구 사직로 161',
-    designatedYear: '1395년 창건',
+    period: '조선시대',
+    designatedDate: null,  // DateTime 타입
     descriptionKo: '''경복궁은 조선왕조 제일의 법궁으로, 북으로 북악산을 기대어 자리 잡았습니다.
 
 1395년 태조 이성계가 창건하였고, 1592년 임진왜란으로 불타 없어졌다가 고종 때인 1867년 중건되었습니다. 흥선대원군이 주도한 중건 공사는 경복궁을 다시 옛 모습으로 복원하는 대규모 사업이었습니다.
 
 경복궁은 500년 조선왕조의 역사와 문화가 살아 숨 쉬는 곳으로, 근정전, 경회루, 향원정 등 아름다운 건축물들이 자리하고 있습니다.''',
+    admin: '문화재청 경복궁관리소',
     images: [
       HeritageImage(
         id: '1',
         heritageId: '1',
-        url: 'https://example.com/image1.jpg',
-        caption: '근정전 전경',
+        imageUrl: 'https://example.com/image1.jpg',
+        description: '근정전 전경',
       ),
       HeritageImage(
         id: '2',
         heritageId: '1',
-        url: 'https://example.com/image2.jpg',
-        caption: '경회루',
+        imageUrl: 'https://example.com/image2.jpg',
+        description: '경회루',
       ),
       HeritageImage(
         id: '3',
         heritageId: '1',
-        url: 'https://example.com/image3.jpg',
-        caption: '향원정',
+        imageUrl: 'https://example.com/image3.jpg',
+        description: '향원정',
       ),
     ],
   );
@@ -139,7 +146,7 @@ class _HeritageDetailScreenState extends ConsumerState<HeritageDetailScreen> {
                       
                       final image = _heritage.images[index];
                       return CachedNetworkImage(
-                        imageUrl: image.url,
+                        imageUrl: image.imageUrl,
                         fit: BoxFit.cover,
                         placeholder: (context, url) => const Center(
                           child: CircularProgressIndicator(),
@@ -256,10 +263,10 @@ class _HeritageDetailScreenState extends ConsumerState<HeritageDetailScreen> {
           icon: Icons.category_outlined,
           label: _heritage.category,
         ),
-        if (_heritage.designatedYear != null)
+        if (_heritage.period != null)
           _MetaItem(
             icon: Icons.event_outlined,
-            label: _heritage.designatedYear!,
+            label: _heritage.period!,
           ),
         _MetaItem(
           icon: Icons.location_on_outlined,

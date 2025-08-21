@@ -8,22 +8,29 @@ part 'heritage.g.dart';
 class Heritage with _$Heritage {
   const factory Heritage({
     required String id,
+    required String kdcd,
+    required String ctcd,
+    required String asno,
     required String nameKo,
+    String? nameHanja,
     String? nameEn,
     String? nameJa,
     String? nameZh,
     required String category,
+    String? cityName,
+    String? sigungu,
+    required String address,
     required double latitude,
     required double longitude,
-    required String address,
-    String? designatedYear,
+    String? period,
+    DateTime? designatedDate,
     String? descriptionKo,
     String? descriptionEn,
     String? descriptionJa,
     String? descriptionZh,
+    String? admin,
     @Default([]) List<HeritageImage> images,
-    double? distance, // 현재 위치로부터의 거리 (km)
-    @Default(false) bool isBookmarked,
+    double? distanceKm,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) = _Heritage;
@@ -38,11 +45,12 @@ class HeritageImage with _$HeritageImage {
   const factory HeritageImage({
     required String id,
     required String heritageId,
-    required String url,
+    required String imageUrl,
     String? thumbnailUrl,
-    String? caption,
+    String? description,
     String? copyright,
-    int? orderIndex,
+    @Default(0) int displayOrder,
+    DateTime? createdAt,
   }) = _HeritageImage;
 
   factory HeritageImage.fromJson(Map<String, dynamic> json) =>

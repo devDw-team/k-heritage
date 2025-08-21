@@ -21,23 +21,29 @@ Heritage _$HeritageFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$Heritage {
   String get id => throw _privateConstructorUsedError;
+  String get kdcd => throw _privateConstructorUsedError;
+  String get ctcd => throw _privateConstructorUsedError;
+  String get asno => throw _privateConstructorUsedError;
   String get nameKo => throw _privateConstructorUsedError;
+  String? get nameHanja => throw _privateConstructorUsedError;
   String? get nameEn => throw _privateConstructorUsedError;
   String? get nameJa => throw _privateConstructorUsedError;
   String? get nameZh => throw _privateConstructorUsedError;
   String get category => throw _privateConstructorUsedError;
+  String? get cityName => throw _privateConstructorUsedError;
+  String? get sigungu => throw _privateConstructorUsedError;
+  String get address => throw _privateConstructorUsedError;
   double get latitude => throw _privateConstructorUsedError;
   double get longitude => throw _privateConstructorUsedError;
-  String get address => throw _privateConstructorUsedError;
-  String? get designatedYear => throw _privateConstructorUsedError;
+  String? get period => throw _privateConstructorUsedError;
+  DateTime? get designatedDate => throw _privateConstructorUsedError;
   String? get descriptionKo => throw _privateConstructorUsedError;
   String? get descriptionEn => throw _privateConstructorUsedError;
   String? get descriptionJa => throw _privateConstructorUsedError;
   String? get descriptionZh => throw _privateConstructorUsedError;
+  String? get admin => throw _privateConstructorUsedError;
   List<HeritageImage> get images => throw _privateConstructorUsedError;
-  double? get distance =>
-      throw _privateConstructorUsedError; // 현재 위치로부터의 거리 (km)
-  bool get isBookmarked => throw _privateConstructorUsedError;
+  double? get distanceKm => throw _privateConstructorUsedError;
   DateTime? get createdAt => throw _privateConstructorUsedError;
   DateTime? get updatedAt => throw _privateConstructorUsedError;
 
@@ -58,22 +64,29 @@ abstract class $HeritageCopyWith<$Res> {
   @useResult
   $Res call(
       {String id,
+      String kdcd,
+      String ctcd,
+      String asno,
       String nameKo,
+      String? nameHanja,
       String? nameEn,
       String? nameJa,
       String? nameZh,
       String category,
+      String? cityName,
+      String? sigungu,
+      String address,
       double latitude,
       double longitude,
-      String address,
-      String? designatedYear,
+      String? period,
+      DateTime? designatedDate,
       String? descriptionKo,
       String? descriptionEn,
       String? descriptionJa,
       String? descriptionZh,
+      String? admin,
       List<HeritageImage> images,
-      double? distance,
-      bool isBookmarked,
+      double? distanceKm,
       DateTime? createdAt,
       DateTime? updatedAt});
 }
@@ -94,22 +107,29 @@ class _$HeritageCopyWithImpl<$Res, $Val extends Heritage>
   @override
   $Res call({
     Object? id = null,
+    Object? kdcd = null,
+    Object? ctcd = null,
+    Object? asno = null,
     Object? nameKo = null,
+    Object? nameHanja = freezed,
     Object? nameEn = freezed,
     Object? nameJa = freezed,
     Object? nameZh = freezed,
     Object? category = null,
+    Object? cityName = freezed,
+    Object? sigungu = freezed,
+    Object? address = null,
     Object? latitude = null,
     Object? longitude = null,
-    Object? address = null,
-    Object? designatedYear = freezed,
+    Object? period = freezed,
+    Object? designatedDate = freezed,
     Object? descriptionKo = freezed,
     Object? descriptionEn = freezed,
     Object? descriptionJa = freezed,
     Object? descriptionZh = freezed,
+    Object? admin = freezed,
     Object? images = null,
-    Object? distance = freezed,
-    Object? isBookmarked = null,
+    Object? distanceKm = freezed,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
   }) {
@@ -118,10 +138,26 @@ class _$HeritageCopyWithImpl<$Res, $Val extends Heritage>
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
+      kdcd: null == kdcd
+          ? _value.kdcd
+          : kdcd // ignore: cast_nullable_to_non_nullable
+              as String,
+      ctcd: null == ctcd
+          ? _value.ctcd
+          : ctcd // ignore: cast_nullable_to_non_nullable
+              as String,
+      asno: null == asno
+          ? _value.asno
+          : asno // ignore: cast_nullable_to_non_nullable
+              as String,
       nameKo: null == nameKo
           ? _value.nameKo
           : nameKo // ignore: cast_nullable_to_non_nullable
               as String,
+      nameHanja: freezed == nameHanja
+          ? _value.nameHanja
+          : nameHanja // ignore: cast_nullable_to_non_nullable
+              as String?,
       nameEn: freezed == nameEn
           ? _value.nameEn
           : nameEn // ignore: cast_nullable_to_non_nullable
@@ -138,6 +174,18 @@ class _$HeritageCopyWithImpl<$Res, $Val extends Heritage>
           ? _value.category
           : category // ignore: cast_nullable_to_non_nullable
               as String,
+      cityName: freezed == cityName
+          ? _value.cityName
+          : cityName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      sigungu: freezed == sigungu
+          ? _value.sigungu
+          : sigungu // ignore: cast_nullable_to_non_nullable
+              as String?,
+      address: null == address
+          ? _value.address
+          : address // ignore: cast_nullable_to_non_nullable
+              as String,
       latitude: null == latitude
           ? _value.latitude
           : latitude // ignore: cast_nullable_to_non_nullable
@@ -146,14 +194,14 @@ class _$HeritageCopyWithImpl<$Res, $Val extends Heritage>
           ? _value.longitude
           : longitude // ignore: cast_nullable_to_non_nullable
               as double,
-      address: null == address
-          ? _value.address
-          : address // ignore: cast_nullable_to_non_nullable
-              as String,
-      designatedYear: freezed == designatedYear
-          ? _value.designatedYear
-          : designatedYear // ignore: cast_nullable_to_non_nullable
+      period: freezed == period
+          ? _value.period
+          : period // ignore: cast_nullable_to_non_nullable
               as String?,
+      designatedDate: freezed == designatedDate
+          ? _value.designatedDate
+          : designatedDate // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
       descriptionKo: freezed == descriptionKo
           ? _value.descriptionKo
           : descriptionKo // ignore: cast_nullable_to_non_nullable
@@ -170,18 +218,18 @@ class _$HeritageCopyWithImpl<$Res, $Val extends Heritage>
           ? _value.descriptionZh
           : descriptionZh // ignore: cast_nullable_to_non_nullable
               as String?,
+      admin: freezed == admin
+          ? _value.admin
+          : admin // ignore: cast_nullable_to_non_nullable
+              as String?,
       images: null == images
           ? _value.images
           : images // ignore: cast_nullable_to_non_nullable
               as List<HeritageImage>,
-      distance: freezed == distance
-          ? _value.distance
-          : distance // ignore: cast_nullable_to_non_nullable
+      distanceKm: freezed == distanceKm
+          ? _value.distanceKm
+          : distanceKm // ignore: cast_nullable_to_non_nullable
               as double?,
-      isBookmarked: null == isBookmarked
-          ? _value.isBookmarked
-          : isBookmarked // ignore: cast_nullable_to_non_nullable
-              as bool,
       createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -204,22 +252,29 @@ abstract class _$$HeritageImplCopyWith<$Res>
   @useResult
   $Res call(
       {String id,
+      String kdcd,
+      String ctcd,
+      String asno,
       String nameKo,
+      String? nameHanja,
       String? nameEn,
       String? nameJa,
       String? nameZh,
       String category,
+      String? cityName,
+      String? sigungu,
+      String address,
       double latitude,
       double longitude,
-      String address,
-      String? designatedYear,
+      String? period,
+      DateTime? designatedDate,
       String? descriptionKo,
       String? descriptionEn,
       String? descriptionJa,
       String? descriptionZh,
+      String? admin,
       List<HeritageImage> images,
-      double? distance,
-      bool isBookmarked,
+      double? distanceKm,
       DateTime? createdAt,
       DateTime? updatedAt});
 }
@@ -238,22 +293,29 @@ class __$$HeritageImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? id = null,
+    Object? kdcd = null,
+    Object? ctcd = null,
+    Object? asno = null,
     Object? nameKo = null,
+    Object? nameHanja = freezed,
     Object? nameEn = freezed,
     Object? nameJa = freezed,
     Object? nameZh = freezed,
     Object? category = null,
+    Object? cityName = freezed,
+    Object? sigungu = freezed,
+    Object? address = null,
     Object? latitude = null,
     Object? longitude = null,
-    Object? address = null,
-    Object? designatedYear = freezed,
+    Object? period = freezed,
+    Object? designatedDate = freezed,
     Object? descriptionKo = freezed,
     Object? descriptionEn = freezed,
     Object? descriptionJa = freezed,
     Object? descriptionZh = freezed,
+    Object? admin = freezed,
     Object? images = null,
-    Object? distance = freezed,
-    Object? isBookmarked = null,
+    Object? distanceKm = freezed,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
   }) {
@@ -262,10 +324,26 @@ class __$$HeritageImplCopyWithImpl<$Res>
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
+      kdcd: null == kdcd
+          ? _value.kdcd
+          : kdcd // ignore: cast_nullable_to_non_nullable
+              as String,
+      ctcd: null == ctcd
+          ? _value.ctcd
+          : ctcd // ignore: cast_nullable_to_non_nullable
+              as String,
+      asno: null == asno
+          ? _value.asno
+          : asno // ignore: cast_nullable_to_non_nullable
+              as String,
       nameKo: null == nameKo
           ? _value.nameKo
           : nameKo // ignore: cast_nullable_to_non_nullable
               as String,
+      nameHanja: freezed == nameHanja
+          ? _value.nameHanja
+          : nameHanja // ignore: cast_nullable_to_non_nullable
+              as String?,
       nameEn: freezed == nameEn
           ? _value.nameEn
           : nameEn // ignore: cast_nullable_to_non_nullable
@@ -282,6 +360,18 @@ class __$$HeritageImplCopyWithImpl<$Res>
           ? _value.category
           : category // ignore: cast_nullable_to_non_nullable
               as String,
+      cityName: freezed == cityName
+          ? _value.cityName
+          : cityName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      sigungu: freezed == sigungu
+          ? _value.sigungu
+          : sigungu // ignore: cast_nullable_to_non_nullable
+              as String?,
+      address: null == address
+          ? _value.address
+          : address // ignore: cast_nullable_to_non_nullable
+              as String,
       latitude: null == latitude
           ? _value.latitude
           : latitude // ignore: cast_nullable_to_non_nullable
@@ -290,14 +380,14 @@ class __$$HeritageImplCopyWithImpl<$Res>
           ? _value.longitude
           : longitude // ignore: cast_nullable_to_non_nullable
               as double,
-      address: null == address
-          ? _value.address
-          : address // ignore: cast_nullable_to_non_nullable
-              as String,
-      designatedYear: freezed == designatedYear
-          ? _value.designatedYear
-          : designatedYear // ignore: cast_nullable_to_non_nullable
+      period: freezed == period
+          ? _value.period
+          : period // ignore: cast_nullable_to_non_nullable
               as String?,
+      designatedDate: freezed == designatedDate
+          ? _value.designatedDate
+          : designatedDate // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
       descriptionKo: freezed == descriptionKo
           ? _value.descriptionKo
           : descriptionKo // ignore: cast_nullable_to_non_nullable
@@ -314,18 +404,18 @@ class __$$HeritageImplCopyWithImpl<$Res>
           ? _value.descriptionZh
           : descriptionZh // ignore: cast_nullable_to_non_nullable
               as String?,
+      admin: freezed == admin
+          ? _value.admin
+          : admin // ignore: cast_nullable_to_non_nullable
+              as String?,
       images: null == images
           ? _value._images
           : images // ignore: cast_nullable_to_non_nullable
               as List<HeritageImage>,
-      distance: freezed == distance
-          ? _value.distance
-          : distance // ignore: cast_nullable_to_non_nullable
+      distanceKm: freezed == distanceKm
+          ? _value.distanceKm
+          : distanceKm // ignore: cast_nullable_to_non_nullable
               as double?,
-      isBookmarked: null == isBookmarked
-          ? _value.isBookmarked
-          : isBookmarked // ignore: cast_nullable_to_non_nullable
-              as bool,
       createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -343,22 +433,29 @@ class __$$HeritageImplCopyWithImpl<$Res>
 class _$HeritageImpl implements _Heritage {
   const _$HeritageImpl(
       {required this.id,
+      required this.kdcd,
+      required this.ctcd,
+      required this.asno,
       required this.nameKo,
+      this.nameHanja,
       this.nameEn,
       this.nameJa,
       this.nameZh,
       required this.category,
+      this.cityName,
+      this.sigungu,
+      required this.address,
       required this.latitude,
       required this.longitude,
-      required this.address,
-      this.designatedYear,
+      this.period,
+      this.designatedDate,
       this.descriptionKo,
       this.descriptionEn,
       this.descriptionJa,
       this.descriptionZh,
+      this.admin,
       final List<HeritageImage> images = const [],
-      this.distance,
-      this.isBookmarked = false,
+      this.distanceKm,
       this.createdAt,
       this.updatedAt})
       : _images = images;
@@ -369,7 +466,15 @@ class _$HeritageImpl implements _Heritage {
   @override
   final String id;
   @override
+  final String kdcd;
+  @override
+  final String ctcd;
+  @override
+  final String asno;
+  @override
   final String nameKo;
+  @override
+  final String? nameHanja;
   @override
   final String? nameEn;
   @override
@@ -379,13 +484,19 @@ class _$HeritageImpl implements _Heritage {
   @override
   final String category;
   @override
+  final String? cityName;
+  @override
+  final String? sigungu;
+  @override
+  final String address;
+  @override
   final double latitude;
   @override
   final double longitude;
   @override
-  final String address;
+  final String? period;
   @override
-  final String? designatedYear;
+  final DateTime? designatedDate;
   @override
   final String? descriptionKo;
   @override
@@ -394,6 +505,8 @@ class _$HeritageImpl implements _Heritage {
   final String? descriptionJa;
   @override
   final String? descriptionZh;
+  @override
+  final String? admin;
   final List<HeritageImage> _images;
   @override
   @JsonKey()
@@ -404,11 +517,7 @@ class _$HeritageImpl implements _Heritage {
   }
 
   @override
-  final double? distance;
-// 현재 위치로부터의 거리 (km)
-  @override
-  @JsonKey()
-  final bool isBookmarked;
+  final double? distanceKm;
   @override
   final DateTime? createdAt;
   @override
@@ -416,7 +525,7 @@ class _$HeritageImpl implements _Heritage {
 
   @override
   String toString() {
-    return 'Heritage(id: $id, nameKo: $nameKo, nameEn: $nameEn, nameJa: $nameJa, nameZh: $nameZh, category: $category, latitude: $latitude, longitude: $longitude, address: $address, designatedYear: $designatedYear, descriptionKo: $descriptionKo, descriptionEn: $descriptionEn, descriptionJa: $descriptionJa, descriptionZh: $descriptionZh, images: $images, distance: $distance, isBookmarked: $isBookmarked, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'Heritage(id: $id, kdcd: $kdcd, ctcd: $ctcd, asno: $asno, nameKo: $nameKo, nameHanja: $nameHanja, nameEn: $nameEn, nameJa: $nameJa, nameZh: $nameZh, category: $category, cityName: $cityName, sigungu: $sigungu, address: $address, latitude: $latitude, longitude: $longitude, period: $period, designatedDate: $designatedDate, descriptionKo: $descriptionKo, descriptionEn: $descriptionEn, descriptionJa: $descriptionJa, descriptionZh: $descriptionZh, admin: $admin, images: $images, distanceKm: $distanceKm, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -425,19 +534,28 @@ class _$HeritageImpl implements _Heritage {
         (other.runtimeType == runtimeType &&
             other is _$HeritageImpl &&
             (identical(other.id, id) || other.id == id) &&
+            (identical(other.kdcd, kdcd) || other.kdcd == kdcd) &&
+            (identical(other.ctcd, ctcd) || other.ctcd == ctcd) &&
+            (identical(other.asno, asno) || other.asno == asno) &&
             (identical(other.nameKo, nameKo) || other.nameKo == nameKo) &&
+            (identical(other.nameHanja, nameHanja) ||
+                other.nameHanja == nameHanja) &&
             (identical(other.nameEn, nameEn) || other.nameEn == nameEn) &&
             (identical(other.nameJa, nameJa) || other.nameJa == nameJa) &&
             (identical(other.nameZh, nameZh) || other.nameZh == nameZh) &&
             (identical(other.category, category) ||
                 other.category == category) &&
+            (identical(other.cityName, cityName) ||
+                other.cityName == cityName) &&
+            (identical(other.sigungu, sigungu) || other.sigungu == sigungu) &&
+            (identical(other.address, address) || other.address == address) &&
             (identical(other.latitude, latitude) ||
                 other.latitude == latitude) &&
             (identical(other.longitude, longitude) ||
                 other.longitude == longitude) &&
-            (identical(other.address, address) || other.address == address) &&
-            (identical(other.designatedYear, designatedYear) ||
-                other.designatedYear == designatedYear) &&
+            (identical(other.period, period) || other.period == period) &&
+            (identical(other.designatedDate, designatedDate) ||
+                other.designatedDate == designatedDate) &&
             (identical(other.descriptionKo, descriptionKo) ||
                 other.descriptionKo == descriptionKo) &&
             (identical(other.descriptionEn, descriptionEn) ||
@@ -446,11 +564,10 @@ class _$HeritageImpl implements _Heritage {
                 other.descriptionJa == descriptionJa) &&
             (identical(other.descriptionZh, descriptionZh) ||
                 other.descriptionZh == descriptionZh) &&
+            (identical(other.admin, admin) || other.admin == admin) &&
             const DeepCollectionEquality().equals(other._images, _images) &&
-            (identical(other.distance, distance) ||
-                other.distance == distance) &&
-            (identical(other.isBookmarked, isBookmarked) ||
-                other.isBookmarked == isBookmarked) &&
+            (identical(other.distanceKm, distanceKm) ||
+                other.distanceKm == distanceKm) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
@@ -462,22 +579,29 @@ class _$HeritageImpl implements _Heritage {
   int get hashCode => Object.hashAll([
         runtimeType,
         id,
+        kdcd,
+        ctcd,
+        asno,
         nameKo,
+        nameHanja,
         nameEn,
         nameJa,
         nameZh,
         category,
+        cityName,
+        sigungu,
+        address,
         latitude,
         longitude,
-        address,
-        designatedYear,
+        period,
+        designatedDate,
         descriptionKo,
         descriptionEn,
         descriptionJa,
         descriptionZh,
+        admin,
         const DeepCollectionEquality().hash(_images),
-        distance,
-        isBookmarked,
+        distanceKm,
         createdAt,
         updatedAt
       ]);
@@ -501,22 +625,29 @@ class _$HeritageImpl implements _Heritage {
 abstract class _Heritage implements Heritage {
   const factory _Heritage(
       {required final String id,
+      required final String kdcd,
+      required final String ctcd,
+      required final String asno,
       required final String nameKo,
+      final String? nameHanja,
       final String? nameEn,
       final String? nameJa,
       final String? nameZh,
       required final String category,
+      final String? cityName,
+      final String? sigungu,
+      required final String address,
       required final double latitude,
       required final double longitude,
-      required final String address,
-      final String? designatedYear,
+      final String? period,
+      final DateTime? designatedDate,
       final String? descriptionKo,
       final String? descriptionEn,
       final String? descriptionJa,
       final String? descriptionZh,
+      final String? admin,
       final List<HeritageImage> images,
-      final double? distance,
-      final bool isBookmarked,
+      final double? distanceKm,
       final DateTime? createdAt,
       final DateTime? updatedAt}) = _$HeritageImpl;
 
@@ -526,7 +657,15 @@ abstract class _Heritage implements Heritage {
   @override
   String get id;
   @override
+  String get kdcd;
+  @override
+  String get ctcd;
+  @override
+  String get asno;
+  @override
   String get nameKo;
+  @override
+  String? get nameHanja;
   @override
   String? get nameEn;
   @override
@@ -536,13 +675,19 @@ abstract class _Heritage implements Heritage {
   @override
   String get category;
   @override
+  String? get cityName;
+  @override
+  String? get sigungu;
+  @override
+  String get address;
+  @override
   double get latitude;
   @override
   double get longitude;
   @override
-  String get address;
+  String? get period;
   @override
-  String? get designatedYear;
+  DateTime? get designatedDate;
   @override
   String? get descriptionKo;
   @override
@@ -552,11 +697,11 @@ abstract class _Heritage implements Heritage {
   @override
   String? get descriptionZh;
   @override
+  String? get admin;
+  @override
   List<HeritageImage> get images;
   @override
-  double? get distance; // 현재 위치로부터의 거리 (km)
-  @override
-  bool get isBookmarked;
+  double? get distanceKm;
   @override
   DateTime? get createdAt;
   @override
@@ -578,11 +723,12 @@ HeritageImage _$HeritageImageFromJson(Map<String, dynamic> json) {
 mixin _$HeritageImage {
   String get id => throw _privateConstructorUsedError;
   String get heritageId => throw _privateConstructorUsedError;
-  String get url => throw _privateConstructorUsedError;
+  String get imageUrl => throw _privateConstructorUsedError;
   String? get thumbnailUrl => throw _privateConstructorUsedError;
-  String? get caption => throw _privateConstructorUsedError;
+  String? get description => throw _privateConstructorUsedError;
   String? get copyright => throw _privateConstructorUsedError;
-  int? get orderIndex => throw _privateConstructorUsedError;
+  int get displayOrder => throw _privateConstructorUsedError;
+  DateTime? get createdAt => throw _privateConstructorUsedError;
 
   /// Serializes this HeritageImage to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -603,11 +749,12 @@ abstract class $HeritageImageCopyWith<$Res> {
   $Res call(
       {String id,
       String heritageId,
-      String url,
+      String imageUrl,
       String? thumbnailUrl,
-      String? caption,
+      String? description,
       String? copyright,
-      int? orderIndex});
+      int displayOrder,
+      DateTime? createdAt});
 }
 
 /// @nodoc
@@ -627,11 +774,12 @@ class _$HeritageImageCopyWithImpl<$Res, $Val extends HeritageImage>
   $Res call({
     Object? id = null,
     Object? heritageId = null,
-    Object? url = null,
+    Object? imageUrl = null,
     Object? thumbnailUrl = freezed,
-    Object? caption = freezed,
+    Object? description = freezed,
     Object? copyright = freezed,
-    Object? orderIndex = freezed,
+    Object? displayOrder = null,
+    Object? createdAt = freezed,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -642,26 +790,30 @@ class _$HeritageImageCopyWithImpl<$Res, $Val extends HeritageImage>
           ? _value.heritageId
           : heritageId // ignore: cast_nullable_to_non_nullable
               as String,
-      url: null == url
-          ? _value.url
-          : url // ignore: cast_nullable_to_non_nullable
+      imageUrl: null == imageUrl
+          ? _value.imageUrl
+          : imageUrl // ignore: cast_nullable_to_non_nullable
               as String,
       thumbnailUrl: freezed == thumbnailUrl
           ? _value.thumbnailUrl
           : thumbnailUrl // ignore: cast_nullable_to_non_nullable
               as String?,
-      caption: freezed == caption
-          ? _value.caption
-          : caption // ignore: cast_nullable_to_non_nullable
+      description: freezed == description
+          ? _value.description
+          : description // ignore: cast_nullable_to_non_nullable
               as String?,
       copyright: freezed == copyright
           ? _value.copyright
           : copyright // ignore: cast_nullable_to_non_nullable
               as String?,
-      orderIndex: freezed == orderIndex
-          ? _value.orderIndex
-          : orderIndex // ignore: cast_nullable_to_non_nullable
-              as int?,
+      displayOrder: null == displayOrder
+          ? _value.displayOrder
+          : displayOrder // ignore: cast_nullable_to_non_nullable
+              as int,
+      createdAt: freezed == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
     ) as $Val);
   }
 }
@@ -677,11 +829,12 @@ abstract class _$$HeritageImageImplCopyWith<$Res>
   $Res call(
       {String id,
       String heritageId,
-      String url,
+      String imageUrl,
       String? thumbnailUrl,
-      String? caption,
+      String? description,
       String? copyright,
-      int? orderIndex});
+      int displayOrder,
+      DateTime? createdAt});
 }
 
 /// @nodoc
@@ -699,11 +852,12 @@ class __$$HeritageImageImplCopyWithImpl<$Res>
   $Res call({
     Object? id = null,
     Object? heritageId = null,
-    Object? url = null,
+    Object? imageUrl = null,
     Object? thumbnailUrl = freezed,
-    Object? caption = freezed,
+    Object? description = freezed,
     Object? copyright = freezed,
-    Object? orderIndex = freezed,
+    Object? displayOrder = null,
+    Object? createdAt = freezed,
   }) {
     return _then(_$HeritageImageImpl(
       id: null == id
@@ -714,26 +868,30 @@ class __$$HeritageImageImplCopyWithImpl<$Res>
           ? _value.heritageId
           : heritageId // ignore: cast_nullable_to_non_nullable
               as String,
-      url: null == url
-          ? _value.url
-          : url // ignore: cast_nullable_to_non_nullable
+      imageUrl: null == imageUrl
+          ? _value.imageUrl
+          : imageUrl // ignore: cast_nullable_to_non_nullable
               as String,
       thumbnailUrl: freezed == thumbnailUrl
           ? _value.thumbnailUrl
           : thumbnailUrl // ignore: cast_nullable_to_non_nullable
               as String?,
-      caption: freezed == caption
-          ? _value.caption
-          : caption // ignore: cast_nullable_to_non_nullable
+      description: freezed == description
+          ? _value.description
+          : description // ignore: cast_nullable_to_non_nullable
               as String?,
       copyright: freezed == copyright
           ? _value.copyright
           : copyright // ignore: cast_nullable_to_non_nullable
               as String?,
-      orderIndex: freezed == orderIndex
-          ? _value.orderIndex
-          : orderIndex // ignore: cast_nullable_to_non_nullable
-              as int?,
+      displayOrder: null == displayOrder
+          ? _value.displayOrder
+          : displayOrder // ignore: cast_nullable_to_non_nullable
+              as int,
+      createdAt: freezed == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
     ));
   }
 }
@@ -744,11 +902,12 @@ class _$HeritageImageImpl implements _HeritageImage {
   const _$HeritageImageImpl(
       {required this.id,
       required this.heritageId,
-      required this.url,
+      required this.imageUrl,
       this.thumbnailUrl,
-      this.caption,
+      this.description,
       this.copyright,
-      this.orderIndex});
+      this.displayOrder = 0,
+      this.createdAt});
 
   factory _$HeritageImageImpl.fromJson(Map<String, dynamic> json) =>
       _$$HeritageImageImplFromJson(json);
@@ -758,19 +917,22 @@ class _$HeritageImageImpl implements _HeritageImage {
   @override
   final String heritageId;
   @override
-  final String url;
+  final String imageUrl;
   @override
   final String? thumbnailUrl;
   @override
-  final String? caption;
+  final String? description;
   @override
   final String? copyright;
   @override
-  final int? orderIndex;
+  @JsonKey()
+  final int displayOrder;
+  @override
+  final DateTime? createdAt;
 
   @override
   String toString() {
-    return 'HeritageImage(id: $id, heritageId: $heritageId, url: $url, thumbnailUrl: $thumbnailUrl, caption: $caption, copyright: $copyright, orderIndex: $orderIndex)';
+    return 'HeritageImage(id: $id, heritageId: $heritageId, imageUrl: $imageUrl, thumbnailUrl: $thumbnailUrl, description: $description, copyright: $copyright, displayOrder: $displayOrder, createdAt: $createdAt)';
   }
 
   @override
@@ -781,20 +943,24 @@ class _$HeritageImageImpl implements _HeritageImage {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.heritageId, heritageId) ||
                 other.heritageId == heritageId) &&
-            (identical(other.url, url) || other.url == url) &&
+            (identical(other.imageUrl, imageUrl) ||
+                other.imageUrl == imageUrl) &&
             (identical(other.thumbnailUrl, thumbnailUrl) ||
                 other.thumbnailUrl == thumbnailUrl) &&
-            (identical(other.caption, caption) || other.caption == caption) &&
+            (identical(other.description, description) ||
+                other.description == description) &&
             (identical(other.copyright, copyright) ||
                 other.copyright == copyright) &&
-            (identical(other.orderIndex, orderIndex) ||
-                other.orderIndex == orderIndex));
+            (identical(other.displayOrder, displayOrder) ||
+                other.displayOrder == displayOrder) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, heritageId, url,
-      thumbnailUrl, caption, copyright, orderIndex);
+  int get hashCode => Object.hash(runtimeType, id, heritageId, imageUrl,
+      thumbnailUrl, description, copyright, displayOrder, createdAt);
 
   /// Create a copy of HeritageImage
   /// with the given fields replaced by the non-null parameter values.
@@ -816,11 +982,12 @@ abstract class _HeritageImage implements HeritageImage {
   const factory _HeritageImage(
       {required final String id,
       required final String heritageId,
-      required final String url,
+      required final String imageUrl,
       final String? thumbnailUrl,
-      final String? caption,
+      final String? description,
       final String? copyright,
-      final int? orderIndex}) = _$HeritageImageImpl;
+      final int displayOrder,
+      final DateTime? createdAt}) = _$HeritageImageImpl;
 
   factory _HeritageImage.fromJson(Map<String, dynamic> json) =
       _$HeritageImageImpl.fromJson;
@@ -830,15 +997,17 @@ abstract class _HeritageImage implements HeritageImage {
   @override
   String get heritageId;
   @override
-  String get url;
+  String get imageUrl;
   @override
   String? get thumbnailUrl;
   @override
-  String? get caption;
+  String? get description;
   @override
   String? get copyright;
   @override
-  int? get orderIndex;
+  int get displayOrder;
+  @override
+  DateTime? get createdAt;
 
   /// Create a copy of HeritageImage
   /// with the given fields replaced by the non-null parameter values.

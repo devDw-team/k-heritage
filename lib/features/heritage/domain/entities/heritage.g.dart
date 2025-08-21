@@ -9,25 +9,34 @@ part of 'heritage.dart';
 _$HeritageImpl _$$HeritageImplFromJson(Map<String, dynamic> json) =>
     _$HeritageImpl(
       id: json['id'] as String,
+      kdcd: json['kdcd'] as String,
+      ctcd: json['ctcd'] as String,
+      asno: json['asno'] as String,
       nameKo: json['nameKo'] as String,
+      nameHanja: json['nameHanja'] as String?,
       nameEn: json['nameEn'] as String?,
       nameJa: json['nameJa'] as String?,
       nameZh: json['nameZh'] as String?,
       category: json['category'] as String,
+      cityName: json['cityName'] as String?,
+      sigungu: json['sigungu'] as String?,
+      address: json['address'] as String,
       latitude: (json['latitude'] as num).toDouble(),
       longitude: (json['longitude'] as num).toDouble(),
-      address: json['address'] as String,
-      designatedYear: json['designatedYear'] as String?,
+      period: json['period'] as String?,
+      designatedDate: json['designatedDate'] == null
+          ? null
+          : DateTime.parse(json['designatedDate'] as String),
       descriptionKo: json['descriptionKo'] as String?,
       descriptionEn: json['descriptionEn'] as String?,
       descriptionJa: json['descriptionJa'] as String?,
       descriptionZh: json['descriptionZh'] as String?,
+      admin: json['admin'] as String?,
       images: (json['images'] as List<dynamic>?)
               ?.map((e) => HeritageImage.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
-      distance: (json['distance'] as num?)?.toDouble(),
-      isBookmarked: json['isBookmarked'] as bool? ?? false,
+      distanceKm: (json['distanceKm'] as num?)?.toDouble(),
       createdAt: json['createdAt'] == null
           ? null
           : DateTime.parse(json['createdAt'] as String),
@@ -39,22 +48,29 @@ _$HeritageImpl _$$HeritageImplFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$$HeritageImplToJson(_$HeritageImpl instance) =>
     <String, dynamic>{
       'id': instance.id,
+      'kdcd': instance.kdcd,
+      'ctcd': instance.ctcd,
+      'asno': instance.asno,
       'nameKo': instance.nameKo,
+      'nameHanja': instance.nameHanja,
       'nameEn': instance.nameEn,
       'nameJa': instance.nameJa,
       'nameZh': instance.nameZh,
       'category': instance.category,
+      'cityName': instance.cityName,
+      'sigungu': instance.sigungu,
+      'address': instance.address,
       'latitude': instance.latitude,
       'longitude': instance.longitude,
-      'address': instance.address,
-      'designatedYear': instance.designatedYear,
+      'period': instance.period,
+      'designatedDate': instance.designatedDate?.toIso8601String(),
       'descriptionKo': instance.descriptionKo,
       'descriptionEn': instance.descriptionEn,
       'descriptionJa': instance.descriptionJa,
       'descriptionZh': instance.descriptionZh,
+      'admin': instance.admin,
       'images': instance.images,
-      'distance': instance.distance,
-      'isBookmarked': instance.isBookmarked,
+      'distanceKm': instance.distanceKm,
       'createdAt': instance.createdAt?.toIso8601String(),
       'updatedAt': instance.updatedAt?.toIso8601String(),
     };
@@ -63,22 +79,26 @@ _$HeritageImageImpl _$$HeritageImageImplFromJson(Map<String, dynamic> json) =>
     _$HeritageImageImpl(
       id: json['id'] as String,
       heritageId: json['heritageId'] as String,
-      url: json['url'] as String,
+      imageUrl: json['imageUrl'] as String,
       thumbnailUrl: json['thumbnailUrl'] as String?,
-      caption: json['caption'] as String?,
+      description: json['description'] as String?,
       copyright: json['copyright'] as String?,
-      orderIndex: (json['orderIndex'] as num?)?.toInt(),
+      displayOrder: (json['displayOrder'] as num?)?.toInt() ?? 0,
+      createdAt: json['createdAt'] == null
+          ? null
+          : DateTime.parse(json['createdAt'] as String),
     );
 
 Map<String, dynamic> _$$HeritageImageImplToJson(_$HeritageImageImpl instance) =>
     <String, dynamic>{
       'id': instance.id,
       'heritageId': instance.heritageId,
-      'url': instance.url,
+      'imageUrl': instance.imageUrl,
       'thumbnailUrl': instance.thumbnailUrl,
-      'caption': instance.caption,
+      'description': instance.description,
       'copyright': instance.copyright,
-      'orderIndex': instance.orderIndex,
+      'displayOrder': instance.displayOrder,
+      'createdAt': instance.createdAt?.toIso8601String(),
     };
 
 _$ThemeImpl _$$ThemeImplFromJson(Map<String, dynamic> json) => _$ThemeImpl(

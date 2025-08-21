@@ -7,7 +7,8 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_theme.dart';
 import '../../../../app/theme/app_typography.dart';
 import '../../domain/entities/heritage.dart';
-import '../widgets/heritage_card.dart';
+import '../../application/heritage_controller.dart';
+import '../widgets/heritage_list_tile.dart';
 import '../widgets/category_chip.dart';
 
 /// 홈 화면 (지도 + 하단 시트)
@@ -23,57 +24,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   final DraggableScrollableController _sheetController =
       DraggableScrollableController();
   
-  String _selectedCategory = '전체';
-  final Set<Marker> _markers = {};
   bool _isMapReady = false;
   
   // 서울 시청 기본 좌표
   static const LatLng _defaultLocation = LatLng(37.5665, 126.9780);
-  LatLng _currentLocation = _defaultLocation;
 
-  // 더미 데이터
-  final List<Heritage> _heritages = [
-    const Heritage(
-      id: '1',
-      nameKo: '숭례문',
-      category: '국보',
-      latitude: 37.5598,
-      longitude: 126.9755,
-      address: '서울특별시 중구 세종대로 40',
-      designatedYear: '1962',
-      descriptionKo: '서울의 남대문으로 알려진 조선시대 한양도성의 정문',
-      distance: 0.8,
-    ),
-    const Heritage(
-      id: '2',
-      nameKo: '덕수궁 중화전',
-      category: '보물',
-      latitude: 37.5658,
-      longitude: 126.9751,
-      address: '서울특별시 중구 세종대로 99',
-      designatedYear: '1985',
-      descriptionKo: '덕수궁의 정전으로 왕의 즉위식과 중요한 의식이 거행되던 곳',
-      distance: 1.2,
-    ),
-    const Heritage(
-      id: '3',
-      nameKo: '경복궁',
-      category: '사적',
-      latitude: 37.5796,
-      longitude: 126.9770,
-      address: '서울특별시 종로구 사직로 161',
-      designatedYear: '1963',
-      descriptionKo: '조선왕조 제일의 법궁',
-      distance: 1.5,
-    ),
-  ];
-
-  final List<String> _categories = ['전체', '국보', '보물', '사적', '명승'];
+  final List<String> _categories = ['전체', '국보', '보물', '사적', '명승', '천연기념물', '무형문화재'];
 
   @override
   void initState() {
     super.initState();
-    _initializeMarkers();
+    // Load heritage data on init
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(heritageControllerProvider.notifier).loadNearbyHeritages();
+    });
   }
 
   @override
@@ -82,41 +46,54 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     super.dispose();
   }
 
-  void _initializeMarkers() {
-    for (final heritage in _heritages) {
-      _markers.add(
-        Marker(
-          markerId: MarkerId(heritage.id),
-          position: LatLng(heritage.latitude, heritage.longitude),
-          infoWindow: InfoWindow(
-            title: heritage.nameKo,
-            snippet: heritage.category,
-          ),
-          onTap: () => _onMarkerTapped(heritage),
+  Set<Marker> _buildMarkers(List<Heritage> heritages) {
+    return heritages.map((heritage) {
+      return Marker(
+        markerId: MarkerId(heritage.id),
+        position: LatLng(heritage.latitude, heritage.longitude),
+        infoWindow: InfoWindow(
+          title: heritage.nameKo,
+          snippet: heritage.category,
         ),
+        onTap: () => _onMarkerTapped(heritage.id),
       );
-    }
+    }).toSet();
   }
 
-  void _onMarkerTapped(Heritage heritage) {
+  void _onMarkerTapped(String heritageId) {
+    // Select heritage in controller
+    ref.read(heritageControllerProvider.notifier).selectHeritage(heritageId);
+    
     // 하단 시트 확장
     _sheetController.animateTo(
       0.5,
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeOutCubic,
     );
+  }
+
+  void _onMyLocationPressed() async {
+    final state = ref.read(heritageControllerProvider);
     
-    // TODO: 선택된 문화재로 스크롤
+    if (!state.hasLocationPermission) {
+      // Request permission
+      await ref.read(heritageControllerProvider.notifier).requestLocationPermission();
+    }
+    
+    final position = ref.read(heritageControllerProvider).currentPosition;
+    if (position != null) {
+      _mapController?.animateCamera(
+        CameraUpdate.newLatLngZoom(
+          LatLng(position.latitude, position.longitude),
+          15,
+        ),
+      );
+    }
   }
 
-  void _onMyLocationPressed() {
-    // TODO: 현재 위치로 이동
-    _mapController?.animateCamera(
-      CameraUpdate.newLatLngZoom(_currentLocation, 15),
-    );
-  }
-
-  Widget _buildMap() {
+  Widget _buildMap(HeritageState heritageState) {
+    final markers = _buildMarkers(heritageState.filteredHeritages);
+    
     // Google Maps API 키가 설정되지 않은 경우 플레이스홀더 표시
     return Container(
       color: AppColors.grayLight.withOpacity(0.3),
@@ -132,13 +109,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       _mapController = controller;
                       _isMapReady = true;
                     });
+                    
+                    // Move camera to current position if available
+                    final position = heritageState.currentPosition;
+                    if (position != null) {
+                      _mapController?.animateCamera(
+                        CameraUpdate.newLatLngZoom(
+                          LatLng(position.latitude, position.longitude),
+                          14,
+                        ),
+                      );
+                    }
                   },
-                  initialCameraPosition: const CameraPosition(
-                    target: _defaultLocation,
+                  initialCameraPosition: CameraPosition(
+                    target: heritageState.currentPosition != null
+                        ? LatLng(heritageState.currentPosition!.latitude,
+                                heritageState.currentPosition!.longitude)
+                        : _defaultLocation,
                     zoom: 14,
                   ),
-                  markers: _markers,
-                  myLocationEnabled: false, // 권한 처리 전까지 비활성화
+                  markers: markers,
+                  myLocationEnabled: heritageState.hasLocationPermission,
                   myLocationButtonEnabled: false,
                   zoomControlsEnabled: false,
                   mapToolbarEnabled: false,
@@ -181,6 +172,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final heritageState = ref.watch(heritageControllerProvider);
+    
     return Scaffold(
       appBar: AppBar(
         title: const Text('주변 문화재'),
@@ -202,14 +195,55 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       body: Stack(
         children: [
           // 지도 (에러 처리 추가)
-          _buildMap(),
+          _buildMap(heritageState),
+          
+          // Loading indicator
+          if (heritageState.isLoading)
+            const Center(
+              child: CircularProgressIndicator(),
+            ),
+          
+          // Error message
+          if (heritageState.error != null)
+            Positioned(
+              top: MediaQuery.of(context).padding.top + 80,
+              left: 16,
+              right: 16,
+              child: Card(
+                color: Colors.red.shade100,
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Row(
+                    children: [
+                      Icon(Icons.error_outline, color: Colors.red.shade700),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          heritageState.error!,
+                          style: TextStyle(color: Colors.red.shade700),
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () {
+                          ref.read(heritageControllerProvider.notifier).clearError();
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
           
           // FAB (현재 위치)
           Positioned(
             right: 16,
-            bottom: MediaQuery.of(context).size.height * 0.5,
+            bottom: MediaQuery.of(context).size.height * 0.48,
             child: FloatingActionButton(
               onPressed: _onMyLocationPressed,
+              backgroundColor: AppColors.surface,
+              foregroundColor: AppColors.primary,
+              elevation: 4,
               child: const Icon(Icons.my_location),
             ),
           ),
@@ -217,11 +251,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           // 하단 시트
           DraggableScrollableSheet(
             controller: _sheetController,
-            initialChildSize: 0.3,
-            minChildSize: 0.1,
+            initialChildSize: 0.45,
+            minChildSize: 0.25,
             maxChildSize: 0.9,
             snap: true,
-            snapSizes: const [0.1, 0.3, 0.9],
+            snapSizes: const [0.25, 0.45, 0.9],
             builder: (context, scrollController) {
               return Container(
                 decoration: BoxDecoration(
@@ -255,13 +289,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             const SizedBox(width: 8),
                         itemBuilder: (context, index) {
                           final category = _categories[index];
+                          final isSelected = category == '전체' 
+                              ? heritageState.selectedCategory == null
+                              : heritageState.selectedCategory == category;
                           return CategoryChip(
                             label: category,
-                            isSelected: _selectedCategory == category,
+                            isSelected: isSelected,
                             onTap: () {
-                              setState(() {
-                                _selectedCategory = category;
-                              });
+                              ref.read(heritageControllerProvider.notifier)
+                                  .setCategory(category == '전체' ? null : category);
                             },
                           );
                         },
@@ -272,20 +308,55 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     
                     // 문화재 리스트
                     Expanded(
-                      child: ListView.builder(
-                        controller: scrollController,
-                        padding: const EdgeInsets.all(16),
-                        itemCount: _heritages.length,
-                        itemBuilder: (context, index) {
-                          final heritage = _heritages[index];
-                          return HeritageCard(
-                            heritage: heritage,
-                            onTap: () {
-                              context.push('/heritage/${heritage.id}');
-                            },
-                          );
-                        },
-                      ),
+                      child: heritageState.filteredHeritages.isEmpty
+                          ? Center(
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      Icons.location_off,
+                                      size: 48,
+                                      color: AppColors.grayMedium.withOpacity(0.5),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    Text(
+                                      '주변에 문화재가 없습니다',
+                                      style: AppTypography.bodyLarge.copyWith(
+                                        color: AppColors.grayDark,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        ref.read(heritageControllerProvider.notifier).refreshHeritages();
+                                      },
+                                      child: const Text('새로고침'),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            )
+                          : RefreshIndicator(
+                              onRefresh: () async {
+                                await ref.read(heritageControllerProvider.notifier).refreshHeritages();
+                              },
+                              child: ListView.builder(
+                                controller: scrollController,
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                itemCount: heritageState.filteredHeritages.length,
+                                itemBuilder: (context, index) {
+                                  final heritage = heritageState.filteredHeritages[index];
+                                  return HeritageListTile(
+                                    heritage: heritage,
+                                    onTap: () {
+                                      context.push('/heritage/${heritage.id}');
+                                    },
+                                  );
+                                },
+                              ),
+                            ),
                     ),
                   ],
                 ),
