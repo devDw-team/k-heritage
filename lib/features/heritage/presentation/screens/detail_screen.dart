@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_theme.dart';
 import '../../../../app/theme/app_typography.dart';
 import '../../domain/entities/heritage.dart';
+import '../../application/heritage_controller.dart';
+import '../../../../core/utils/logger.dart';
+import 'heritage_map_screen.dart';
 
 /// 문화재 상세 화면
 class HeritageDetailScreen extends ConsumerStatefulWidget {
@@ -26,55 +28,47 @@ class _HeritageDetailScreenState extends ConsumerState<HeritageDetailScreen> {
   final PageController _pageController = PageController();
   int _currentImageIndex = 0;
   bool _isBookmarked = false;
+  bool _isLoadingDetail = false;
 
-  // 더미 데이터
-  late final Heritage _heritage = const Heritage(
-    id: '1',
-    kdcd: '13',  // 사적 코드
-    ctcd: '11',  // 서울시 코드
-    asno: '00117',  // 관리번호
-    nameKo: '경복궁',
-    nameEn: 'Gyeongbokgung Palace',
-    category: '사적',
-    cityName: '서울특별시',
-    sigungu: '종로구',
-    latitude: 37.5796,
-    longitude: 126.9770,
-    address: '서울특별시 종로구 사직로 161',
-    period: '조선시대',
-    designatedDate: null,  // DateTime 타입
-    descriptionKo: '''경복궁은 조선왕조 제일의 법궁으로, 북으로 북악산을 기대어 자리 잡았습니다.
-
-1395년 태조 이성계가 창건하였고, 1592년 임진왜란으로 불타 없어졌다가 고종 때인 1867년 중건되었습니다. 흥선대원군이 주도한 중건 공사는 경복궁을 다시 옛 모습으로 복원하는 대규모 사업이었습니다.
-
-경복궁은 500년 조선왕조의 역사와 문화가 살아 숨 쉬는 곳으로, 근정전, 경회루, 향원정 등 아름다운 건축물들이 자리하고 있습니다.''',
-    admin: '문화재청 경복궁관리소',
-    images: [
-      HeritageImage(
-        id: '1',
-        heritageId: '1',
-        imageUrl: 'https://example.com/image1.jpg',
-        description: '근정전 전경',
-      ),
-      HeritageImage(
-        id: '2',
-        heritageId: '1',
-        imageUrl: 'https://example.com/image2.jpg',
-        description: '경회루',
-      ),
-      HeritageImage(
-        id: '3',
-        heritageId: '1',
-        imageUrl: 'https://example.com/image3.jpg',
-        description: '향원정',
-      ),
-    ],
-  );
+  @override
+  void initState() {
+    super.initState();
+    // Delay the provider modification to avoid modifying during build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadHeritageDetail();
+    });
+  }
 
   @override
   void dispose() {
     _pageController.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadHeritageDetail() async {
+    if (!mounted) return;
+    
+    setState(() {
+      _isLoadingDetail = true;
+    });
+
+    try {
+      // Load detailed heritage data
+      await ref.read(heritageControllerProvider.notifier).selectHeritage(widget.heritageId);
+    } catch (e) {
+      Log.e('Failed to load heritage detail', error: e);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('문화재 정보를 불러오는데 실패했습니다: ${e.toString()}')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoadingDetail = false;
+        });
+      }
+    }
   }
 
   void _toggleBookmark() {
@@ -89,25 +83,74 @@ class _HeritageDetailScreenState extends ConsumerState<HeritageDetailScreen> {
   }
 
   void _share() {
-    // TODO: 공유 기능 구현
+    final heritage = ref.read(heritageControllerProvider).selectedHeritage;
+    if (heritage != null) {
+      // TODO: Implement share functionality
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('공유 기능은 준비 중입니다')),
+      );
+    }
   }
 
-  void _openNavigation() async {
-    final url = Uri.parse(
-      'https://www.google.com/maps/dir/?api=1&destination=${_heritage.latitude},${_heritage.longitude}',
-    );
-    
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url);
+  void _openNavigation() {
+    final heritage = ref.read(heritageControllerProvider).selectedHeritage;
+    if (heritage != null) {
+      // Navigate to map screen to show this heritage location
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => HeritageMapScreen(heritage: heritage),
+        ),
+      );
     }
   }
 
   void _playAudioGuide() {
-    // TODO: 오디오 가이드 재생
+    final heritage = ref.read(heritageControllerProvider).selectedHeritage;
+    if (heritage == null) return;
+
+    // Find Korean narration
+    final hasNarration = heritage.narrations.isNotEmpty;
+    
+    if (!hasNarration) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('오디오 가이드가 준비되지 않았습니다')),
+      );
+      return;
+    }
+
+    // For now, just show that narration is available
+    // Audio playback can be implemented later with proper initialization
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('오디오 가이드 기능은 준비 중입니다')),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final heritageState = ref.watch(heritageControllerProvider);
+    final heritage = heritageState.selectedHeritage;
+
+    if (_isLoadingDetail || heritage == null) {
+      return Scaffold(
+        appBar: AppBar(),
+        body: const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    // 이미지 리스트 준비 (메인 이미지를 첫 번째로)
+    final List<String> allImageUrls = [];
+    if (heritage.mainImageUrl != null && heritage.mainImageUrl!.isNotEmpty) {
+      allImageUrls.add(heritage.mainImageUrl!);
+    }
+    for (final image in heritage.images) {
+      // 메인 이미지와 중복되지 않는 이미지만 추가
+      if (image.imageUrl != heritage.mainImageUrl) {
+        allImageUrls.add(image.imageUrl);
+      }
+    }
+
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -138,27 +181,27 @@ class _HeritageDetailScreenState extends ConsumerState<HeritageDetailScreen> {
                         _currentImageIndex = index;
                       });
                     },
-                    itemCount: _heritage.images.isEmpty ? 1 : _heritage.images.length,
+                    itemCount: allImageUrls.isEmpty ? 1 : allImageUrls.length,
                     itemBuilder: (context, index) {
-                      if (_heritage.images.isEmpty) {
-                        return _buildPlaceholderImage();
+                      if (allImageUrls.isEmpty) {
+                        return _buildPlaceholderImage(heritage.nameKo);
                       }
                       
-                      final image = _heritage.images[index];
+                      final imageUrl = allImageUrls[index];
                       return CachedNetworkImage(
-                        imageUrl: image.imageUrl,
+                        imageUrl: imageUrl,
                         fit: BoxFit.cover,
                         placeholder: (context, url) => const Center(
                           child: CircularProgressIndicator(),
                         ),
                         errorWidget: (context, url, error) =>
-                            _buildPlaceholderImage(),
+                            _buildPlaceholderImage(heritage.nameKo),
                       );
                     },
                   ),
                   
                   // 페이지 인디케이터
-                  if (_heritage.images.isNotEmpty)
+                  if (allImageUrls.length > 1)
                     Positioned(
                       bottom: 16,
                       right: 16,
@@ -173,7 +216,7 @@ class _HeritageDetailScreenState extends ConsumerState<HeritageDetailScreen> {
                               BorderRadius.circular(AppTheme.radiusFull),
                         ),
                         child: Text(
-                          '${_currentImageIndex + 1} / ${_heritage.images.length}',
+                          '${_currentImageIndex + 1} / ${allImageUrls.length}',
                           style: AppTypography.labelSmall.copyWith(
                             color: Colors.white,
                           ),
@@ -193,23 +236,23 @@ class _HeritageDetailScreenState extends ConsumerState<HeritageDetailScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // 제목 및 카테고리
-                  _buildHeader(),
+                  _buildHeader(heritage),
                   const SizedBox(height: 24),
                   
                   // 메타 정보
-                  _buildMetaInfo(),
+                  _buildMetaInfo(heritage),
                   const SizedBox(height: 24),
                   
                   // 설명
-                  _buildDescription(),
+                  _buildDescription(heritage),
                   const SizedBox(height: 24),
                   
                   // 액션 버튼들
-                  _buildActionButtons(),
+                  _buildActionButtons(heritage),
                   const SizedBox(height: 24),
                   
                   // 관련 정보
-                  _buildRelatedInfo(),
+                  _buildRelatedInfo(heritage),
                   const SizedBox(height: 32),
                 ],
               ),
@@ -220,32 +263,53 @@ class _HeritageDetailScreenState extends ConsumerState<HeritageDetailScreen> {
     );
   }
 
-  Widget _buildPlaceholderImage() {
+  Widget _buildPlaceholderImage(String name) {
     return Container(
       color: AppColors.celadonGreen.withOpacity(0.3),
       child: Center(
-        child: Icon(
-          Icons.temple_buddhist,
-          size: 64,
-          color: Colors.white.withOpacity(0.7),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.temple_buddhist,
+              size: 64,
+              color: Colors.white.withOpacity(0.7),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              name,
+              style: AppTypography.bodyMedium.copyWith(
+                color: Colors.white.withOpacity(0.9),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(Heritage heritage) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          _heritage.nameKo,
+          heritage.nameKo,
           style: AppTypography.h2,
         ),
-        if (_heritage.nameEn != null) ...[
+        if (heritage.nameEn != null) ...[
           const SizedBox(height: 4),
           Text(
-            _heritage.nameEn!,
+            heritage.nameEn!,
             style: AppTypography.bodyMedium.copyWith(
+              color: AppColors.grayMedium,
+            ),
+          ),
+        ],
+        if (heritage.nameHanja != null) ...[
+          const SizedBox(height: 2),
+          Text(
+            heritage.nameHanja!,
+            style: AppTypography.bodySmall.copyWith(
               color: AppColors.grayMedium,
             ),
           ),
@@ -254,29 +318,34 @@ class _HeritageDetailScreenState extends ConsumerState<HeritageDetailScreen> {
     );
   }
 
-  Widget _buildMetaInfo() {
+  Widget _buildMetaInfo(Heritage heritage) {
     return Wrap(
       spacing: 16,
       runSpacing: 12,
       children: [
         _MetaItem(
           icon: Icons.category_outlined,
-          label: _heritage.category,
+          label: heritage.category,
         ),
-        if (_heritage.period != null)
+        if (heritage.period != null)
           _MetaItem(
             icon: Icons.event_outlined,
-            label: _heritage.period!,
+            label: heritage.period!,
           ),
         _MetaItem(
           icon: Icons.location_on_outlined,
-          label: _heritage.address,
+          label: heritage.address,
         ),
+        if (heritage.designatedDate != null)
+          _MetaItem(
+            icon: Icons.calendar_today_outlined,
+            label: '${heritage.designatedDate!.year}년 지정',
+          ),
       ],
     );
   }
 
-  Widget _buildDescription() {
+  Widget _buildDescription(Heritage heritage) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -286,7 +355,7 @@ class _HeritageDetailScreenState extends ConsumerState<HeritageDetailScreen> {
         ),
         const SizedBox(height: 12),
         Text(
-          _heritage.descriptionKo ?? '설명이 없습니다.',
+          heritage.descriptionKo ?? '설명이 없습니다.',
           style: AppTypography.bodyMedium.copyWith(
             height: 1.8,
             color: AppColors.grayDark,
@@ -296,14 +365,14 @@ class _HeritageDetailScreenState extends ConsumerState<HeritageDetailScreen> {
     );
   }
 
-  Widget _buildActionButtons() {
+  Widget _buildActionButtons(Heritage heritage) {
     return Row(
       children: [
         Expanded(
           child: ElevatedButton.icon(
             onPressed: _openNavigation,
-            icon: const Icon(Icons.directions),
-            label: const Text('길찾기'),
+            icon: const Icon(Icons.map),
+            label: const Text('지도에서 보기'),
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 12),
             ),
@@ -324,7 +393,7 @@ class _HeritageDetailScreenState extends ConsumerState<HeritageDetailScreen> {
     );
   }
 
-  Widget _buildRelatedInfo() {
+  Widget _buildRelatedInfo(Heritage heritage) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -335,14 +404,17 @@ class _HeritageDetailScreenState extends ConsumerState<HeritageDetailScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '관람 정보',
+            '상세 정보',
             style: AppTypography.h6,
           ),
           const SizedBox(height: 12),
-          _InfoRow(label: '관람 시간', value: '09:00 - 18:00'),
-          _InfoRow(label: '입장료', value: '성인 3,000원'),
-          _InfoRow(label: '휴관일', value: '매주 화요일'),
-          _InfoRow(label: '문의', value: '02-3700-3900'),
+          if (heritage.cityName != null)
+            _InfoRow(label: '지역', value: '${heritage.cityName} ${heritage.sigungu ?? ''}'),
+          if (heritage.admin != null)
+            _InfoRow(label: '관리처', value: heritage.admin!),
+          if (heritage.distanceKm != null)
+            _InfoRow(label: '거리', value: '${heritage.distanceKm!.toStringAsFixed(1)}km'),
+          _InfoRow(label: '좌표', value: '${heritage.latitude.toStringAsFixed(4)}, ${heritage.longitude.toStringAsFixed(4)}'),
         ],
       ),
     );
@@ -404,10 +476,14 @@ class _InfoRow extends StatelessWidget {
               color: AppColors.grayMedium,
             ),
           ),
-          Text(
-            value,
-            style: AppTypography.bodyMedium.copyWith(
-              fontWeight: FontWeight.w500,
+          Expanded(
+            child: Text(
+              value,
+              style: AppTypography.bodyMedium.copyWith(
+                fontWeight: FontWeight.w500,
+              ),
+              textAlign: TextAlign.end,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],

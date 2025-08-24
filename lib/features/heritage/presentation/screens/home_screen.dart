@@ -47,7 +47,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Set<Marker> _buildMarkers(List<Heritage> heritages) {
+    final selectedHeritage = ref.read(heritageControllerProvider).selectedHeritage;
+    
     return heritages.map((heritage) {
+      final isSelected = selectedHeritage?.id == heritage.id;
+      
       return Marker(
         markerId: MarkerId(heritage.id),
         position: LatLng(heritage.latitude, heritage.longitude),
@@ -55,6 +59,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           title: heritage.nameKo,
           snippet: heritage.category,
         ),
+        icon: isSelected 
+          ? BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure)
+          : BitmapDescriptor.defaultMarker,
         onTap: () => _onMarkerTapped(heritage.id),
       );
     }).toSet();

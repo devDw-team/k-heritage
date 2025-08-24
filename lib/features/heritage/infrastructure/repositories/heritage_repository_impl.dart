@@ -116,7 +116,14 @@ class HeritageRepositoryImpl implements HeritageRepository {
       
       // Cache results
       if (remoteResults.isNotEmpty) {
-        await _localDataSource.upsertHeritages(remoteResults);
+        print('📍 [HeritageRepository] Attempting to cache ${remoteResults.length} search results');
+        try {
+          await _localDataSource.upsertHeritages(remoteResults);
+          print('✅ [HeritageRepository] Successfully cached search results to Supabase');
+        } catch (e) {
+          print('🔴 [HeritageRepository] Failed to cache search results: $e');
+          // Continue without throwing - we still have the data
+        }
       }
       
       // Filter by category if needed
@@ -197,9 +204,17 @@ class HeritageRepositoryImpl implements HeritageRepository {
       
       // Cache in local database
       if (nearbyHeritages.isNotEmpty) {
-        await _localDataSource.upsertHeritages(nearbyHeritages);
+        print('📍 [HeritageRepository] Attempting to cache ${nearbyHeritages.length} nearby heritages');
+        try {
+          await _localDataSource.upsertHeritages(nearbyHeritages);
+          print('✅ [HeritageRepository] Successfully cached heritages to Supabase');
+        } catch (e) {
+          print('🔴 [HeritageRepository] Failed to cache heritages: $e');
+          // Don't throw here - we still have the data from API
+        }
       }
     } catch (e) {
+      print('🔴 [HeritageRepository] Failed to refresh heritages: $e');
       throw Exception('Failed to refresh heritages: $e');
     }
   }

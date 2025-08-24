@@ -29,9 +29,12 @@ class MainScaffold extends StatelessWidget {
               context.go('/themes');
               break;
             case 2:
-              context.go('/bookmarks');
+              context.go('/ktour');
               break;
             case 3:
+              context.go('/bookmarks');
+              break;
+            case 4:
               context.go('/settings');
               break;
           }
@@ -46,6 +49,11 @@ class MainScaffold extends StatelessWidget {
             icon: Icon(Icons.explore_outlined),
             selectedIcon: Icon(Icons.explore),
             label: '테마',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.luggage_outlined),
+            selectedIcon: Icon(Icons.luggage),
+            label: 'K-TOUR',
           ),
           NavigationDestination(
             icon: Icon(Icons.bookmark_outline),
@@ -116,13 +124,20 @@ class CustomBottomNavigationBar extends StatelessWidget {
               _buildNavItem(
                 context: context,
                 index: 2,
+                icon: Icons.luggage_outlined,
+                selectedIcon: Icons.luggage,
+                label: 'K-TOUR',
+              ),
+              _buildNavItem(
+                context: context,
+                index: 3,
                 icon: Icons.bookmark_outline,
                 selectedIcon: Icons.bookmark,
                 label: '북마크',
               ),
               _buildNavItem(
                 context: context,
-                index: 3,
+                index: 4,
                 icon: Icons.settings_outlined,
                 selectedIcon: Icons.settings,
                 label: '설정',

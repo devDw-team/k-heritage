@@ -8,6 +8,7 @@ import '../../features/heritage/presentation/screens/home_screen.dart';
 import '../../features/heritage/presentation/screens/theme_screen.dart';
 import '../../features/bookmarks/presentation/screens/bookmarks_screen.dart';
 import '../../features/settings/presentation/screens/settings_screen.dart';
+import '../../features/ktour/presentation/screens/ktour_home_screen.dart';
 import '../../features/onboarding/presentation/screens/language_selection_screen.dart';
 import '../../features/splash/presentation/screens/splash_screen.dart';
 
@@ -17,6 +18,7 @@ abstract class AppRoutes {
   static const String languageSelection = '/language-selection';
   static const String home = '/home';
   static const String themes = '/themes';
+  static const String ktour = '/ktour';
   static const String bookmarks = '/bookmarks';
   static const String settings = '/settings';
   static const String heritageDetail = '/heritage/:id';
@@ -51,10 +53,12 @@ final routerProvider = Provider<GoRouter>((ref) {
           
           if (currentRoute.startsWith('/themes')) {
             selectedIndex = 1;
-          } else if (currentRoute.startsWith('/bookmarks')) {
+          } else if (currentRoute.startsWith('/ktour')) {
             selectedIndex = 2;
-          } else if (currentRoute.startsWith('/settings')) {
+          } else if (currentRoute.startsWith('/bookmarks')) {
             selectedIndex = 3;
+          } else if (currentRoute.startsWith('/settings')) {
+            selectedIndex = 4;
           }
           
           return MainScaffold(
@@ -78,6 +82,15 @@ final routerProvider = Provider<GoRouter>((ref) {
             name: 'themes',
             pageBuilder: (context, state) => const NoTransitionPage(
               child: ThemeScreen(),
+            ),
+          ),
+          
+          // K-TOUR 화면
+          GoRoute(
+            path: AppRoutes.ktour,
+            name: 'ktour',
+            pageBuilder: (context, state) => const NoTransitionPage(
+              child: KTourHomeScreen(),
             ),
           ),
           
@@ -168,6 +181,9 @@ extension NavigationHelper on BuildContext {
   
   /// 테마 화면으로 이동
   void goThemes() => go(AppRoutes.themes);
+  
+  /// K-TOUR 화면으로 이동
+  void goKTour() => go(AppRoutes.ktour);
   
   /// 북마크 화면으로 이동
   void goBookmarks() => go(AppRoutes.bookmarks);

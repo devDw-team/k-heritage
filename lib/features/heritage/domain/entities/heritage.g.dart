@@ -32,8 +32,14 @@ _$HeritageImpl _$$HeritageImplFromJson(Map<String, dynamic> json) =>
       descriptionJa: json['descriptionJa'] as String?,
       descriptionZh: json['descriptionZh'] as String?,
       admin: json['admin'] as String?,
+      mainImageUrl: json['mainImageUrl'] as String?,
       images: (json['images'] as List<dynamic>?)
               ?.map((e) => HeritageImage.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
+      narrations: (json['narrations'] as List<dynamic>?)
+              ?.map(
+                  (e) => HeritageNarration.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
       distanceKm: (json['distanceKm'] as num?)?.toDouble(),
@@ -69,7 +75,9 @@ Map<String, dynamic> _$$HeritageImplToJson(_$HeritageImpl instance) =>
       'descriptionJa': instance.descriptionJa,
       'descriptionZh': instance.descriptionZh,
       'admin': instance.admin,
+      'mainImageUrl': instance.mainImageUrl,
       'images': instance.images,
+      'narrations': instance.narrations,
       'distanceKm': instance.distanceKm,
       'createdAt': instance.createdAt?.toIso8601String(),
       'updatedAt': instance.updatedAt?.toIso8601String(),
@@ -95,6 +103,34 @@ Map<String, dynamic> _$$HeritageImageImplToJson(_$HeritageImageImpl instance) =>
       'heritageId': instance.heritageId,
       'imageUrl': instance.imageUrl,
       'thumbnailUrl': instance.thumbnailUrl,
+      'description': instance.description,
+      'copyright': instance.copyright,
+      'displayOrder': instance.displayOrder,
+      'createdAt': instance.createdAt?.toIso8601String(),
+    };
+
+_$HeritageNarrationImpl _$$HeritageNarrationImplFromJson(
+        Map<String, dynamic> json) =>
+    _$HeritageNarrationImpl(
+      id: json['id'] as String,
+      heritageId: json['heritageId'] as String,
+      audioUrl: json['audioUrl'] as String,
+      language: json['language'] as String? ?? 'ko',
+      description: json['description'] as String?,
+      copyright: json['copyright'] as String?,
+      displayOrder: (json['displayOrder'] as num?)?.toInt() ?? 0,
+      createdAt: json['createdAt'] == null
+          ? null
+          : DateTime.parse(json['createdAt'] as String),
+    );
+
+Map<String, dynamic> _$$HeritageNarrationImplToJson(
+        _$HeritageNarrationImpl instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'heritageId': instance.heritageId,
+      'audioUrl': instance.audioUrl,
+      'language': instance.language,
       'description': instance.description,
       'copyright': instance.copyright,
       'displayOrder': instance.displayOrder,

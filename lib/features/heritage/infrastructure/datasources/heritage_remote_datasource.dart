@@ -172,7 +172,14 @@ class HeritageRemoteDataSource {
         ctcd: ctcd,
       );
       
-      return heritage.copyWith(images: images);
+      // Fetch narrations
+      final narrations = await fetchHeritageNarrations(
+        kdcd: kdcd,
+        asno: asno,
+        ctcd: ctcd,
+      );
+      
+      return heritage.copyWith(images: images, narrations: narrations);
     } catch (e) {
       throw Exception('Failed to fetch heritage detail: $e');
     }
@@ -251,6 +258,76 @@ class HeritageRemoteDataSource {
     }
   }
   
+  Future<List<HeritageNarration>> fetchHeritageNarrations({
+    required String kdcd,
+    required String asno,
+    required String ctcd,
+  }) async {
+    try {
+      Log.d('Fetching narrations for heritage: kdcd=$kdcd, asno=$asno, ctcd=$ctcd');
+      
+      final response = await _dio.get(
+        '/SearchVoiceOpenapi.do',
+        queryParameters: {
+          'ccbaKdcd': kdcd,
+          'ccbaAsno': asno,
+          'ccbaCtcd': ctcd,
+        },
+      );
+      
+      final document = xml.XmlDocument.parse(response.data);
+      final items = document.findAllElements('item');
+      
+      Log.d('Found ${items.length} narrations for heritage');
+      
+      final narrations = items.indexed.map((indexed) {
+        final (index, item) = indexed;
+        var voiceUrl = _getElementText(item, 'voiceUrl') ?? '';
+        final voiceNuri = _getElementText(item, 'voiceNuri') ?? '';
+        final ccbaVcdesc = _getElementText(item, 'ccbaVcdesc') ?? '';
+        final voiceLang = _getElementText(item, 'voiceLang') ?? 'ko';
+        
+        // 나레이션 URL 검증 및 수정
+        if (voiceUrl.isNotEmpty) {
+          voiceUrl = voiceUrl.trim();
+          
+          Log.d('Original narration URL: $voiceUrl');
+          
+          // If URL doesn't start with http, add the base URL
+          if (!voiceUrl.startsWith('http')) {
+            voiceUrl = 'http://www.khs.go.kr$voiceUrl';
+          }
+          
+          // Skip invalid URLs
+          if (voiceUrl.contains('heritage.go.kr')) {
+            Log.w('Skipping heritage.go.kr narration URL: $voiceUrl');
+            return null;
+          }
+        }
+        
+        if (voiceUrl.isEmpty) {
+          return null;
+        }
+        
+        return HeritageNarration(
+          id: '${kdcd}_${asno}_${ctcd}_voice_$index',
+          heritageId: '${kdcd}_${asno}_${ctcd}',
+          audioUrl: voiceUrl,
+          language: voiceLang,
+          description: ccbaVcdesc,
+          copyright: voiceNuri,
+          displayOrder: index,
+        );
+      }).where((narration) => narration != null).cast<HeritageNarration>().toList();
+      
+      Log.d('Returning ${narrations.length} valid narrations');
+      return narrations;
+    } catch (e) {
+      Log.e('Error fetching heritage narrations', error: e);
+      return [];
+    }
+  }
+  
   Heritage _parseHeritage(xml.XmlElement item) {
     final kdcd = _getElementText(item, 'ccbaKdcd') ?? '';
     final asno = _getElementText(item, 'ccbaAsno') ?? '';
@@ -283,10 +360,28 @@ class HeritageRemoteDataSource {
   Heritage _parseDetailHeritage(xml.XmlElement item) {
     final heritage = _parseHeritage(item);
     final content = _getElementText(item, 'content');
+    var imageUrl = _getElementText(item, 'imageUrl');
+    
+    // 메인 이미지 URL 검증 및 수정
+    if (imageUrl != null && imageUrl.isNotEmpty) {
+      imageUrl = imageUrl.trim();
+      
+      // If URL doesn't start with http, add the base URL
+      if (!imageUrl.startsWith('http')) {
+        imageUrl = 'http://www.khs.go.kr$imageUrl';
+      }
+      
+      // Skip invalid URLs
+      if (imageUrl.contains('heritage.go.kr')) {
+        Log.w('Skipping invalid main image URL: $imageUrl');
+        imageUrl = null;
+      }
+    }
     
     return heritage.copyWith(
       descriptionKo: content,
       admin: _getElementText(item, 'ccbaAdmin'),
+      mainImageUrl: imageUrl,
     );
   }
   

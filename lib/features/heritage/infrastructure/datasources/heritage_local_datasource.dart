@@ -158,6 +158,7 @@ class HeritageLocalDataSource {
         'description_ja': heritage.descriptionJa,
         'description_zh': heritage.descriptionZh,
         'admin': heritage.admin,
+        'main_image_url': heritage.mainImageUrl,
       });
       
       // Upsert images
@@ -175,6 +176,7 @@ class HeritageLocalDataSource {
         );
       }
     } catch (e) {
+      print('🔴 [HeritageLocalDataSource] Failed to upsert heritage ${heritage.id}: $e');
       throw Exception('Failed to upsert heritage: $e');
     }
   }
@@ -183,6 +185,9 @@ class HeritageLocalDataSource {
     try {
       if (heritages.isEmpty) return;
       
+      print('🔵 [HeritageLocalDataSource] Upserting ${heritages.length} heritages to Supabase...');
+      
+      // Upsert heritages
       await _supabase.from('heritage').upsert(
         heritages.map((h) => {
           'id': h.id,
@@ -207,12 +212,17 @@ class HeritageLocalDataSource {
           'description_ja': h.descriptionJa,
           'description_zh': h.descriptionZh,
           'admin': h.admin,
+          'main_image_url': h.mainImageUrl,
         }).toList()
       );
+      
+      print('🔵 [HeritageLocalDataSource] Heritage upsert successful');
       
       // Upsert all images
       final allImages = heritages.expand((h) => h.images).toList();
       if (allImages.isNotEmpty) {
+        print('🔵 [HeritageLocalDataSource] Upserting ${allImages.length} images...');
+        
         await _supabase.from('heritage_image').upsert(
           allImages.map((img) => {
             'id': img.id,
@@ -224,8 +234,14 @@ class HeritageLocalDataSource {
             'display_order': img.displayOrder,
           }).toList()
         );
+        
+        print('🔵 [HeritageLocalDataSource] Image upsert successful');
       }
+      
+      print('✅ [HeritageLocalDataSource] Successfully upserted ${heritages.length} heritages with ${allImages.length} images');
     } catch (e) {
+      print('🔴 [HeritageLocalDataSource] Failed to upsert heritages: $e');
+      print('🔴 [HeritageLocalDataSource] Stack trace: ${StackTrace.current}');
       throw Exception('Failed to upsert heritages: $e');
     }
   }

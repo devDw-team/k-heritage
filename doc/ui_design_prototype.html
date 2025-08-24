@@ -491,6 +491,36 @@
             }
         }
         
+        /* K-TOUR 전용 스타일 */
+        .ktour-menu-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+            border-color: currentColor !important;
+        }
+        
+        .ktour-attraction-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .ktour-attraction-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .ktour-festival-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            background: #FF9800;
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            border-radius: var(--radius-sm);
+        }
+        
         /* ===== 다크모드 ===== */
         @media (prefers-color-scheme: dark) {
             :root {
@@ -563,6 +593,101 @@
         </div>
         
         <!-- 화면 프로토타입들 -->
+        <!-- K-TOUR 디자인 시스템 -->
+        <div style="background: white; padding: var(--spacing-xl); border-radius: var(--radius-lg); margin-bottom: var(--spacing-xl);">
+            <h2 style="font-family: var(--font-serif); font-size: 24px; margin-bottom: var(--spacing-lg);">K-TOUR 디자인 시스템</h2>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-xl);">
+                <div>
+                    <h3 style="font-size: 18px; margin-bottom: var(--spacing-md);">색상 체계</h3>
+                    <div style="display: flex; gap: var(--spacing-sm); flex-wrap: wrap;">
+                        <div style="text-align: center;">
+                            <div style="width: 60px; height: 60px; background: #2196F3; border-radius: var(--radius-md);"></div>
+                            <p style="font-size: 12px; margin-top: 4px;">Primary<br>#2196F3</p>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="width: 60px; height: 60px; background: #4CAF50; border-radius: var(--radius-md);"></div>
+                            <p style="font-size: 12px; margin-top: 4px;">Course<br>#4CAF50</p>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="width: 60px; height: 60px; background: #FF9800; border-radius: var(--radius-md);"></div>
+                            <p style="font-size: 12px; margin-top: 4px;">Festival<br>#FF9800</p>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="width: 60px; height: 60px; background: #9C27B0; border-radius: var(--radius-md);"></div>
+                            <p style="font-size: 12px; margin-top: 4px;">Info<br>#9C27B0</p>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h3 style="font-size: 18px; margin-bottom: var(--spacing-md);">아이콘 세트</h3>
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm);">
+                        <div style="text-align: center;">
+                            <span class="material-icons" style="font-size: 24px; color: #2196F3;">map</span>
+                            <p style="font-size: 11px; margin-top: 4px;">여행지</p>
+                        </div>
+                        <div style="text-align: center;">
+                            <span class="material-icons" style="font-size: 24px; color: #4CAF50;">route</span>
+                            <p style="font-size: 11px; margin-top: 4px;">코스</p>
+                        </div>
+                        <div style="text-align: center;">
+                            <span class="material-icons" style="font-size: 24px; color: #FF9800;">festival</span>
+                            <p style="font-size: 11px; margin-top: 4px;">축제</p>
+                        </div>
+                        <div style="text-align: center;">
+                            <span class="material-icons" style="font-size: 24px; color: #9C27B0;">restaurant</span>
+                            <p style="font-size: 11px; margin-top: 4px;">맛집</p>
+                        </div>
+                        <div style="text-align: center;">
+                            <span class="material-icons" style="font-size: 24px; color: #9C27B0;">hotel</span>
+                            <p style="font-size: 11px; margin-top: 4px;">숙박</p>
+                        </div>
+                        <div style="text-align: center;">
+                            <span class="material-icons" style="font-size: 24px; color: #9C27B0;">directions_bus</span>
+                            <p style="font-size: 11px; margin-top: 4px;">교통</p>
+                        </div>
+                        <div style="text-align: center;">
+                            <span class="material-icons" style="font-size: 24px; color: #795548;">account_balance</span>
+                            <p style="font-size: 11px; margin-top: 4px;">문화재</p>
+                        </div>
+                        <div style="text-align: center;">
+                            <span class="material-icons" style="font-size: 24px; color: #2196F3;">luggage</span>
+                            <p style="font-size: 11px; margin-top: 4px;">K-TOUR</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style="margin-top: var(--spacing-lg);">
+                <h3 style="font-size: 18px; margin-bottom: var(--spacing-md);">브랜드 차별화</h3>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr style="background: #F5F5F5;">
+                        <th style="padding: 8px; text-align: left; border: 1px solid #E0E0E0;">구분</th>
+                        <th style="padding: 8px; text-align: left; border: 1px solid #E0E0E0;">문화재 (Heritage)</th>
+                        <th style="padding: 8px; text-align: left; border: 1px solid #E0E0E0;">K-TOUR</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; border: 1px solid #E0E0E0;">주 색상</td>
+                        <td style="padding: 8px; border: 1px solid #E0E0E0;">갈색 (#795548)</td>
+                        <td style="padding: 8px; border: 1px solid #E0E0E0;">파랑 (#2196F3)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; border: 1px solid #E0E0E0;">콘텐츠</td>
+                        <td style="padding: 8px; border: 1px solid #E0E0E0;">문화재 정보</td>
+                        <td style="padding: 8px; border: 1px solid #E0E0E0;">관광/여행 정보</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; border: 1px solid #E0E0E0;">톤앤매너</td>
+                        <td style="padding: 8px; border: 1px solid #E0E0E0;">전통적, 교육적</td>
+                        <td style="padding: 8px; border: 1px solid #E0E0E0;">활기찬, 실용적</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; border: 1px solid #E0E0E0;">타겟</td>
+                        <td style="padding: 8px; border: 1px solid #E0E0E0;">문화재 애호가</td>
+                        <td style="padding: 8px; border: 1px solid #E0E0E0;">일반 여행자</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(375px, 1fr)); gap: var(--spacing-xl); justify-items: center;">
             
             <!-- 0. 언어 선택 화면 (온보딩) -->
@@ -928,7 +1053,172 @@
                 </div>
             </div>
             
-            <!-- 4. 설정 화면 -->
+            <!-- 4. K-TOUR 메인 화면 -->
+            <div>
+                <h3 style="text-align: center; font-family: var(--font-serif); margin-bottom: var(--spacing-md);">K-TOUR 메인 화면</h3>
+                <div class="screen-mockup">
+                    <div class="status-bar">
+                        <span>9:41</span>
+                        <span style="display: flex; gap: 4px;">
+                            <span class="material-icons" style="font-size: 16px;">signal_cellular_alt</span>
+                            <span class="material-icons" style="font-size: 16px;">wifi</span>
+                            <span class="material-icons" style="font-size: 16px;">battery_full</span>
+                        </span>
+                    </div>
+                    
+                    <div class="app-bar">
+                        <h1 class="app-bar-title">K-TOUR</h1>
+                        <button class="icon-button">
+                            <span class="material-icons">search</span>
+                        </button>
+                        <button class="icon-button">
+                            <span class="material-icons">notifications_none</span>
+                        </button>
+                    </div>
+                    
+                    <div style="height: calc(100% - 100px); overflow-y: auto;">
+                        <!-- 헤더 배너 -->
+                        <div style="margin: var(--spacing-md); height: 180px; background: linear-gradient(135deg, #2196F3, #1976D2); border-radius: var(--radius-lg); position: relative; overflow: hidden; box-shadow: 0 6px 20px rgba(33, 150, 243, 0.3);">
+                            <!-- 배경 패턴 -->
+                            <div style="position: absolute; right: -30px; bottom: -30px; opacity: 0.1;">
+                                <span class="material-icons" style="font-size: 150px; color: white;">luggage</span>
+                            </div>
+                            <!-- 텍스트 콘텐츠 -->
+                            <div style="padding: var(--spacing-lg); color: white;">
+                                <h2 style="font-size: 24px; font-weight: bold; margin-bottom: var(--spacing-sm);">한국 여행의 모든 것</h2>
+                                <p style="font-size: 14px; opacity: 0.9; line-height: 1.5;">관광지, 맛집, 숙박, 축제 정보를<br>한 곳에서 만나보세요</p>
+                            </div>
+                        </div>
+                        
+                        <!-- 메인 메뉴 그리드 -->
+                        <div style="padding: 0 var(--spacing-md);">
+                            <h3 style="font-family: var(--font-serif); font-size: 20px; font-weight: 700; margin-bottom: var(--spacing-md);">여행 정보</h3>
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md);">
+                                <!-- 여행지 탐색 카드 -->
+                                <div class="ktour-menu-card" style="background: white; border: 1px solid #E3F2FD; border-radius: var(--radius-lg); padding: var(--spacing-md); cursor: pointer; transition: all 0.3s;">
+                                    <div style="width: 40px; height: 40px; background: rgba(33, 150, 243, 0.1); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; margin-bottom: var(--spacing-md);">
+                                        <span class="material-icons" style="color: #2196F3;">map</span>
+                                    </div>
+                                    <h4 style="font-size: 16px; font-weight: 600; color: #2196F3; margin-bottom: 4px;">여행지 탐색</h4>
+                                    <p style="font-size: 12px; color: var(--color-gray-medium);">지역별·테마별 관광지</p>
+                                </div>
+                                
+                                <!-- 여행 코스 카드 -->
+                                <div class="ktour-menu-card" style="background: white; border: 1px solid #E8F5E9; border-radius: var(--radius-lg); padding: var(--spacing-md); cursor: pointer; transition: all 0.3s;">
+                                    <div style="width: 40px; height: 40px; background: rgba(76, 175, 80, 0.1); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; margin-bottom: var(--spacing-md);">
+                                        <span class="material-icons" style="color: #4CAF50;">route</span>
+                                    </div>
+                                    <h4 style="font-size: 16px; font-weight: 600; color: #4CAF50; margin-bottom: 4px;">여행 코스</h4>
+                                    <p style="font-size: 12px; color: var(--color-gray-medium);">추천 코스·나만의 코스</p>
+                                </div>
+                                
+                                <!-- 행사/축제 카드 -->
+                                <div class="ktour-menu-card" style="background: white; border: 1px solid #FFF3E0; border-radius: var(--radius-lg); padding: var(--spacing-md); cursor: pointer; transition: all 0.3s;">
+                                    <div style="width: 40px; height: 40px; background: rgba(255, 152, 0, 0.1); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; margin-bottom: var(--spacing-md);">
+                                        <span class="material-icons" style="color: #FF9800;">festival</span>
+                                    </div>
+                                    <h4 style="font-size: 16px; font-weight: 600; color: #FF9800; margin-bottom: 4px;">행사/축제</h4>
+                                    <p style="font-size: 12px; color: var(--color-gray-medium);">지역별 축제·이벤트</p>
+                                </div>
+                                
+                                <!-- 여행 정보 카드 -->
+                                <div class="ktour-menu-card" style="background: white; border: 1px solid #F3E5F5; border-radius: var(--radius-lg); padding: var(--spacing-md); cursor: pointer; transition: all 0.3s;">
+                                    <div style="width: 40px; height: 40px; background: rgba(156, 39, 176, 0.1); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; margin-bottom: var(--spacing-md);">
+                                        <span class="material-icons" style="color: #9C27B0;">info</span>
+                                    </div>
+                                    <h4 style="font-size: 16px; font-weight: 600; color: #9C27B0; margin-bottom: 4px;">여행 정보</h4>
+                                    <p style="font-size: 12px; color: var(--color-gray-medium);">맛집·숙박·교통</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 인기 여행지 섹션 -->
+                        <div style="margin-top: var(--spacing-xl);">
+                            <div style="padding: 0 var(--spacing-md); display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-md);">
+                                <h3 style="font-family: var(--font-serif); font-size: 20px; font-weight: 700;">인기 여행지</h3>
+                                <button style="color: #2196F3; font-size: 14px; background: none; border: none; cursor: pointer;">전체보기 →</button>
+                            </div>
+                            <div style="display: flex; overflow-x: auto; padding: 0 var(--spacing-md); gap: var(--spacing-md);">
+                                <!-- 여행지 카드 1 -->
+                                <div style="min-width: 150px; background: white; border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-sm);">
+                                    <div style="height: 100px; background: linear-gradient(135deg, #64B5F6, #42A5F5);"></div>
+                                    <div style="padding: var(--spacing-md);">
+                                        <h4 style="font-size: 14px; font-weight: 600; margin-bottom: 4px;">제주도</h4>
+                                        <p style="font-size: 12px; color: var(--color-gray-medium);">자연·휴양</p>
+                                        <div style="display: flex; align-items: center; gap: 4px; margin-top: var(--spacing-sm);">
+                                            <span class="material-icons" style="font-size: 14px; color: #FFB300;">star</span>
+                                            <span style="font-size: 12px; color: var(--color-gray-dark);">4.8</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- 여행지 카드 2 -->
+                                <div style="min-width: 150px; background: white; border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-sm);">
+                                    <div style="height: 100px; background: linear-gradient(135deg, #81C784, #66BB6A);"></div>
+                                    <div style="padding: var(--spacing-md);">
+                                        <h4 style="font-size: 14px; font-weight: 600; margin-bottom: 4px;">부산</h4>
+                                        <p style="font-size: 12px; color: var(--color-gray-medium);">바다·도시</p>
+                                        <div style="display: flex; align-items: center; gap: 4px; margin-top: var(--spacing-sm);">
+                                            <span class="material-icons" style="font-size: 14px; color: #FFB300;">star</span>
+                                            <span style="font-size: 12px; color: var(--color-gray-dark);">4.7</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- 여행지 카드 3 -->
+                                <div style="min-width: 150px; background: white; border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-sm);">
+                                    <div style="height: 100px; background: linear-gradient(135deg, #FFB74D, #FFA726);"></div>
+                                    <div style="padding: var(--spacing-md);">
+                                        <h4 style="font-size: 14px; font-weight: 600; margin-bottom: 4px;">경주</h4>
+                                        <p style="font-size: 12px; color: var(--color-gray-medium);">역사·문화</p>
+                                        <div style="display: flex; align-items: center; gap: 4px; margin-top: var(--spacing-sm);">
+                                            <span class="material-icons" style="font-size: 14px; color: #FFB300;">star</span>
+                                            <span style="font-size: 12px; color: var(--color-gray-dark);">4.6</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 진행중인 축제 섹션 -->
+                        <div style="margin-top: var(--spacing-xl); padding-bottom: var(--spacing-xl);">
+                            <div style="padding: 0 var(--spacing-md); display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-md);">
+                                <h3 style="font-family: var(--font-serif); font-size: 20px; font-weight: 700;">진행중인 축제</h3>
+                                <button style="color: #2196F3; font-size: 14px; background: none; border: none; cursor: pointer;">전체보기 →</button>
+                            </div>
+                            <div style="padding: 0 var(--spacing-md);">
+                                <!-- 축제 카드 1 -->
+                                <div style="background: white; border-radius: var(--radius-md); padding: var(--spacing-md); margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: var(--spacing-md); box-shadow: var(--shadow-sm);">
+                                    <div style="width: 60px; height: 60px; background: rgba(255, 152, 0, 0.1); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center;">
+                                        <span class="material-icons" style="color: #FF9800; font-size: 28px;">festival</span>
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <h4 style="font-size: 15px; font-weight: 600; margin-bottom: 4px;">서울 빛초롱 축제</h4>
+                                        <p style="font-size: 13px; color: var(--color-gray-medium); margin-bottom: 2px;">2025.01.01 ~ 2025.01.31</p>
+                                        <p style="font-size: 12px; color: var(--color-gray-dark);">서울 청계천</p>
+                                    </div>
+                                    <span class="material-icons" style="color: var(--color-gray-medium); font-size: 20px;">arrow_forward_ios</span>
+                                </div>
+                                
+                                <!-- 축제 카드 2 -->
+                                <div style="background: white; border-radius: var(--radius-md); padding: var(--spacing-md); margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: var(--spacing-md); box-shadow: var(--shadow-sm);">
+                                    <div style="width: 60px; height: 60px; background: rgba(233, 30, 99, 0.1); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center;">
+                                        <span class="material-icons" style="color: #E91E63; font-size: 28px;">local_florist</span>
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <h4 style="font-size: 15px; font-weight: 600; margin-bottom: 4px;">진해 군항제</h4>
+                                        <p style="font-size: 13px; color: var(--color-gray-medium); margin-bottom: 2px;">2025.03.25 ~ 2025.04.03</p>
+                                        <p style="font-size: 12px; color: var(--color-gray-dark);">경남 창원시</p>
+                                    </div>
+                                    <span class="material-icons" style="color: var(--color-gray-medium); font-size: 20px;">arrow_forward_ios</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 5. 설정 화면 -->
             <div>
                 <h3 style="text-align: center; font-family: var(--font-serif); margin-bottom: var(--spacing-md);">설정 화면</h3>
                 <div class="screen-mockup">

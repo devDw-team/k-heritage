@@ -29,7 +29,9 @@ class Heritage with _$Heritage {
     String? descriptionJa,
     String? descriptionZh,
     String? admin,
+    String? mainImageUrl,
     @Default([]) List<HeritageImage> images,
+    @Default([]) List<HeritageNarration> narrations,
     double? distanceKm,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -55,6 +57,24 @@ class HeritageImage with _$HeritageImage {
 
   factory HeritageImage.fromJson(Map<String, dynamic> json) =>
       _$HeritageImageFromJson(json);
+}
+
+/// 문화재 나레이션 엔티티
+@freezed
+class HeritageNarration with _$HeritageNarration {
+  const factory HeritageNarration({
+    required String id,
+    required String heritageId,
+    required String audioUrl,
+    @Default('ko') String language,
+    String? description,
+    String? copyright,
+    @Default(0) int displayOrder,
+    DateTime? createdAt,
+  }) = _HeritageNarration;
+
+  factory HeritageNarration.fromJson(Map<String, dynamic> json) =>
+      _$HeritageNarrationFromJson(json);
 }
 
 /// 문화재 카테고리 enum

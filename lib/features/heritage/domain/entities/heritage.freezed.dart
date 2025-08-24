@@ -42,7 +42,9 @@ mixin _$Heritage {
   String? get descriptionJa => throw _privateConstructorUsedError;
   String? get descriptionZh => throw _privateConstructorUsedError;
   String? get admin => throw _privateConstructorUsedError;
+  String? get mainImageUrl => throw _privateConstructorUsedError;
   List<HeritageImage> get images => throw _privateConstructorUsedError;
+  List<HeritageNarration> get narrations => throw _privateConstructorUsedError;
   double? get distanceKm => throw _privateConstructorUsedError;
   DateTime? get createdAt => throw _privateConstructorUsedError;
   DateTime? get updatedAt => throw _privateConstructorUsedError;
@@ -85,7 +87,9 @@ abstract class $HeritageCopyWith<$Res> {
       String? descriptionJa,
       String? descriptionZh,
       String? admin,
+      String? mainImageUrl,
       List<HeritageImage> images,
+      List<HeritageNarration> narrations,
       double? distanceKm,
       DateTime? createdAt,
       DateTime? updatedAt});
@@ -128,7 +132,9 @@ class _$HeritageCopyWithImpl<$Res, $Val extends Heritage>
     Object? descriptionJa = freezed,
     Object? descriptionZh = freezed,
     Object? admin = freezed,
+    Object? mainImageUrl = freezed,
     Object? images = null,
+    Object? narrations = null,
     Object? distanceKm = freezed,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
@@ -222,10 +228,18 @@ class _$HeritageCopyWithImpl<$Res, $Val extends Heritage>
           ? _value.admin
           : admin // ignore: cast_nullable_to_non_nullable
               as String?,
+      mainImageUrl: freezed == mainImageUrl
+          ? _value.mainImageUrl
+          : mainImageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
       images: null == images
           ? _value.images
           : images // ignore: cast_nullable_to_non_nullable
               as List<HeritageImage>,
+      narrations: null == narrations
+          ? _value.narrations
+          : narrations // ignore: cast_nullable_to_non_nullable
+              as List<HeritageNarration>,
       distanceKm: freezed == distanceKm
           ? _value.distanceKm
           : distanceKm // ignore: cast_nullable_to_non_nullable
@@ -273,7 +287,9 @@ abstract class _$$HeritageImplCopyWith<$Res>
       String? descriptionJa,
       String? descriptionZh,
       String? admin,
+      String? mainImageUrl,
       List<HeritageImage> images,
+      List<HeritageNarration> narrations,
       double? distanceKm,
       DateTime? createdAt,
       DateTime? updatedAt});
@@ -314,7 +330,9 @@ class __$$HeritageImplCopyWithImpl<$Res>
     Object? descriptionJa = freezed,
     Object? descriptionZh = freezed,
     Object? admin = freezed,
+    Object? mainImageUrl = freezed,
     Object? images = null,
+    Object? narrations = null,
     Object? distanceKm = freezed,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
@@ -408,10 +426,18 @@ class __$$HeritageImplCopyWithImpl<$Res>
           ? _value.admin
           : admin // ignore: cast_nullable_to_non_nullable
               as String?,
+      mainImageUrl: freezed == mainImageUrl
+          ? _value.mainImageUrl
+          : mainImageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
       images: null == images
           ? _value._images
           : images // ignore: cast_nullable_to_non_nullable
               as List<HeritageImage>,
+      narrations: null == narrations
+          ? _value._narrations
+          : narrations // ignore: cast_nullable_to_non_nullable
+              as List<HeritageNarration>,
       distanceKm: freezed == distanceKm
           ? _value.distanceKm
           : distanceKm // ignore: cast_nullable_to_non_nullable
@@ -454,11 +480,14 @@ class _$HeritageImpl implements _Heritage {
       this.descriptionJa,
       this.descriptionZh,
       this.admin,
+      this.mainImageUrl,
       final List<HeritageImage> images = const [],
+      final List<HeritageNarration> narrations = const [],
       this.distanceKm,
       this.createdAt,
       this.updatedAt})
-      : _images = images;
+      : _images = images,
+        _narrations = narrations;
 
   factory _$HeritageImpl.fromJson(Map<String, dynamic> json) =>
       _$$HeritageImplFromJson(json);
@@ -507,6 +536,8 @@ class _$HeritageImpl implements _Heritage {
   final String? descriptionZh;
   @override
   final String? admin;
+  @override
+  final String? mainImageUrl;
   final List<HeritageImage> _images;
   @override
   @JsonKey()
@@ -514,6 +545,15 @@ class _$HeritageImpl implements _Heritage {
     if (_images is EqualUnmodifiableListView) return _images;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_images);
+  }
+
+  final List<HeritageNarration> _narrations;
+  @override
+  @JsonKey()
+  List<HeritageNarration> get narrations {
+    if (_narrations is EqualUnmodifiableListView) return _narrations;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_narrations);
   }
 
   @override
@@ -525,7 +565,7 @@ class _$HeritageImpl implements _Heritage {
 
   @override
   String toString() {
-    return 'Heritage(id: $id, kdcd: $kdcd, ctcd: $ctcd, asno: $asno, nameKo: $nameKo, nameHanja: $nameHanja, nameEn: $nameEn, nameJa: $nameJa, nameZh: $nameZh, category: $category, cityName: $cityName, sigungu: $sigungu, address: $address, latitude: $latitude, longitude: $longitude, period: $period, designatedDate: $designatedDate, descriptionKo: $descriptionKo, descriptionEn: $descriptionEn, descriptionJa: $descriptionJa, descriptionZh: $descriptionZh, admin: $admin, images: $images, distanceKm: $distanceKm, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'Heritage(id: $id, kdcd: $kdcd, ctcd: $ctcd, asno: $asno, nameKo: $nameKo, nameHanja: $nameHanja, nameEn: $nameEn, nameJa: $nameJa, nameZh: $nameZh, category: $category, cityName: $cityName, sigungu: $sigungu, address: $address, latitude: $latitude, longitude: $longitude, period: $period, designatedDate: $designatedDate, descriptionKo: $descriptionKo, descriptionEn: $descriptionEn, descriptionJa: $descriptionJa, descriptionZh: $descriptionZh, admin: $admin, mainImageUrl: $mainImageUrl, images: $images, narrations: $narrations, distanceKm: $distanceKm, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -565,7 +605,11 @@ class _$HeritageImpl implements _Heritage {
             (identical(other.descriptionZh, descriptionZh) ||
                 other.descriptionZh == descriptionZh) &&
             (identical(other.admin, admin) || other.admin == admin) &&
+            (identical(other.mainImageUrl, mainImageUrl) ||
+                other.mainImageUrl == mainImageUrl) &&
             const DeepCollectionEquality().equals(other._images, _images) &&
+            const DeepCollectionEquality()
+                .equals(other._narrations, _narrations) &&
             (identical(other.distanceKm, distanceKm) ||
                 other.distanceKm == distanceKm) &&
             (identical(other.createdAt, createdAt) ||
@@ -600,7 +644,9 @@ class _$HeritageImpl implements _Heritage {
         descriptionJa,
         descriptionZh,
         admin,
+        mainImageUrl,
         const DeepCollectionEquality().hash(_images),
+        const DeepCollectionEquality().hash(_narrations),
         distanceKm,
         createdAt,
         updatedAt
@@ -646,7 +692,9 @@ abstract class _Heritage implements Heritage {
       final String? descriptionJa,
       final String? descriptionZh,
       final String? admin,
+      final String? mainImageUrl,
       final List<HeritageImage> images,
+      final List<HeritageNarration> narrations,
       final double? distanceKm,
       final DateTime? createdAt,
       final DateTime? updatedAt}) = _$HeritageImpl;
@@ -699,7 +747,11 @@ abstract class _Heritage implements Heritage {
   @override
   String? get admin;
   @override
+  String? get mainImageUrl;
+  @override
   List<HeritageImage> get images;
+  @override
+  List<HeritageNarration> get narrations;
   @override
   double? get distanceKm;
   @override
@@ -1014,6 +1066,310 @@ abstract class _HeritageImage implements HeritageImage {
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$HeritageImageImplCopyWith<_$HeritageImageImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+HeritageNarration _$HeritageNarrationFromJson(Map<String, dynamic> json) {
+  return _HeritageNarration.fromJson(json);
+}
+
+/// @nodoc
+mixin _$HeritageNarration {
+  String get id => throw _privateConstructorUsedError;
+  String get heritageId => throw _privateConstructorUsedError;
+  String get audioUrl => throw _privateConstructorUsedError;
+  String get language => throw _privateConstructorUsedError;
+  String? get description => throw _privateConstructorUsedError;
+  String? get copyright => throw _privateConstructorUsedError;
+  int get displayOrder => throw _privateConstructorUsedError;
+  DateTime? get createdAt => throw _privateConstructorUsedError;
+
+  /// Serializes this HeritageNarration to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of HeritageNarration
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $HeritageNarrationCopyWith<HeritageNarration> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $HeritageNarrationCopyWith<$Res> {
+  factory $HeritageNarrationCopyWith(
+          HeritageNarration value, $Res Function(HeritageNarration) then) =
+      _$HeritageNarrationCopyWithImpl<$Res, HeritageNarration>;
+  @useResult
+  $Res call(
+      {String id,
+      String heritageId,
+      String audioUrl,
+      String language,
+      String? description,
+      String? copyright,
+      int displayOrder,
+      DateTime? createdAt});
+}
+
+/// @nodoc
+class _$HeritageNarrationCopyWithImpl<$Res, $Val extends HeritageNarration>
+    implements $HeritageNarrationCopyWith<$Res> {
+  _$HeritageNarrationCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of HeritageNarration
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? heritageId = null,
+    Object? audioUrl = null,
+    Object? language = null,
+    Object? description = freezed,
+    Object? copyright = freezed,
+    Object? displayOrder = null,
+    Object? createdAt = freezed,
+  }) {
+    return _then(_value.copyWith(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      heritageId: null == heritageId
+          ? _value.heritageId
+          : heritageId // ignore: cast_nullable_to_non_nullable
+              as String,
+      audioUrl: null == audioUrl
+          ? _value.audioUrl
+          : audioUrl // ignore: cast_nullable_to_non_nullable
+              as String,
+      language: null == language
+          ? _value.language
+          : language // ignore: cast_nullable_to_non_nullable
+              as String,
+      description: freezed == description
+          ? _value.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String?,
+      copyright: freezed == copyright
+          ? _value.copyright
+          : copyright // ignore: cast_nullable_to_non_nullable
+              as String?,
+      displayOrder: null == displayOrder
+          ? _value.displayOrder
+          : displayOrder // ignore: cast_nullable_to_non_nullable
+              as int,
+      createdAt: freezed == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$HeritageNarrationImplCopyWith<$Res>
+    implements $HeritageNarrationCopyWith<$Res> {
+  factory _$$HeritageNarrationImplCopyWith(_$HeritageNarrationImpl value,
+          $Res Function(_$HeritageNarrationImpl) then) =
+      __$$HeritageNarrationImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {String id,
+      String heritageId,
+      String audioUrl,
+      String language,
+      String? description,
+      String? copyright,
+      int displayOrder,
+      DateTime? createdAt});
+}
+
+/// @nodoc
+class __$$HeritageNarrationImplCopyWithImpl<$Res>
+    extends _$HeritageNarrationCopyWithImpl<$Res, _$HeritageNarrationImpl>
+    implements _$$HeritageNarrationImplCopyWith<$Res> {
+  __$$HeritageNarrationImplCopyWithImpl(_$HeritageNarrationImpl _value,
+      $Res Function(_$HeritageNarrationImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of HeritageNarration
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? heritageId = null,
+    Object? audioUrl = null,
+    Object? language = null,
+    Object? description = freezed,
+    Object? copyright = freezed,
+    Object? displayOrder = null,
+    Object? createdAt = freezed,
+  }) {
+    return _then(_$HeritageNarrationImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      heritageId: null == heritageId
+          ? _value.heritageId
+          : heritageId // ignore: cast_nullable_to_non_nullable
+              as String,
+      audioUrl: null == audioUrl
+          ? _value.audioUrl
+          : audioUrl // ignore: cast_nullable_to_non_nullable
+              as String,
+      language: null == language
+          ? _value.language
+          : language // ignore: cast_nullable_to_non_nullable
+              as String,
+      description: freezed == description
+          ? _value.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String?,
+      copyright: freezed == copyright
+          ? _value.copyright
+          : copyright // ignore: cast_nullable_to_non_nullable
+              as String?,
+      displayOrder: null == displayOrder
+          ? _value.displayOrder
+          : displayOrder // ignore: cast_nullable_to_non_nullable
+              as int,
+      createdAt: freezed == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$HeritageNarrationImpl implements _HeritageNarration {
+  const _$HeritageNarrationImpl(
+      {required this.id,
+      required this.heritageId,
+      required this.audioUrl,
+      this.language = 'ko',
+      this.description,
+      this.copyright,
+      this.displayOrder = 0,
+      this.createdAt});
+
+  factory _$HeritageNarrationImpl.fromJson(Map<String, dynamic> json) =>
+      _$$HeritageNarrationImplFromJson(json);
+
+  @override
+  final String id;
+  @override
+  final String heritageId;
+  @override
+  final String audioUrl;
+  @override
+  @JsonKey()
+  final String language;
+  @override
+  final String? description;
+  @override
+  final String? copyright;
+  @override
+  @JsonKey()
+  final int displayOrder;
+  @override
+  final DateTime? createdAt;
+
+  @override
+  String toString() {
+    return 'HeritageNarration(id: $id, heritageId: $heritageId, audioUrl: $audioUrl, language: $language, description: $description, copyright: $copyright, displayOrder: $displayOrder, createdAt: $createdAt)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$HeritageNarrationImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.heritageId, heritageId) ||
+                other.heritageId == heritageId) &&
+            (identical(other.audioUrl, audioUrl) ||
+                other.audioUrl == audioUrl) &&
+            (identical(other.language, language) ||
+                other.language == language) &&
+            (identical(other.description, description) ||
+                other.description == description) &&
+            (identical(other.copyright, copyright) ||
+                other.copyright == copyright) &&
+            (identical(other.displayOrder, displayOrder) ||
+                other.displayOrder == displayOrder) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, id, heritageId, audioUrl,
+      language, description, copyright, displayOrder, createdAt);
+
+  /// Create a copy of HeritageNarration
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$HeritageNarrationImplCopyWith<_$HeritageNarrationImpl> get copyWith =>
+      __$$HeritageNarrationImplCopyWithImpl<_$HeritageNarrationImpl>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$HeritageNarrationImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _HeritageNarration implements HeritageNarration {
+  const factory _HeritageNarration(
+      {required final String id,
+      required final String heritageId,
+      required final String audioUrl,
+      final String language,
+      final String? description,
+      final String? copyright,
+      final int displayOrder,
+      final DateTime? createdAt}) = _$HeritageNarrationImpl;
+
+  factory _HeritageNarration.fromJson(Map<String, dynamic> json) =
+      _$HeritageNarrationImpl.fromJson;
+
+  @override
+  String get id;
+  @override
+  String get heritageId;
+  @override
+  String get audioUrl;
+  @override
+  String get language;
+  @override
+  String? get description;
+  @override
+  String? get copyright;
+  @override
+  int get displayOrder;
+  @override
+  DateTime? get createdAt;
+
+  /// Create a copy of HeritageNarration
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$HeritageNarrationImplCopyWith<_$HeritageNarrationImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
