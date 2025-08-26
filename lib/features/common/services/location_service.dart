@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 final locationServiceProvider = Provider<LocationService>((ref) {
   return LocationService();
@@ -13,19 +12,40 @@ final currentPositionProvider = FutureProvider<Position?>((ref) async {
 
 class LocationService {
   Future<bool> requestLocationPermission() async {
-    final status = await Permission.location.status;
+    // Geolocator를 사용한 권한 확인
+    LocationPermission permission = await Geolocator.checkPermission();
     
-    if (status.isDenied) {
-      final result = await Permission.location.request();
-      return result.isGranted;
+    // 권한이 이미 허용된 경우
+    if (permission == LocationPermission.always || 
+        permission == LocationPermission.whileInUse) {
+      return true;
     }
     
-    if (status.isPermanentlyDenied) {
-      await openAppSettings();
+    // 권한이 거부된 경우 다시 요청
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      
+      if (permission == LocationPermission.denied) {
+        return false;
+      }
+      
+      if (permission == LocationPermission.deniedForever) {
+        // 영구 거부된 경우 설정으로 이동
+        await Geolocator.openAppSettings();
+        return false;
+      }
+      
+      return permission == LocationPermission.always || 
+             permission == LocationPermission.whileInUse;
+    }
+    
+    // 영구 거부된 경우
+    if (permission == LocationPermission.deniedForever) {
+      await Geolocator.openAppSettings();
       return false;
     }
     
-    return status.isGranted;
+    return false;
   }
   
   Future<bool> isLocationServiceEnabled() async {

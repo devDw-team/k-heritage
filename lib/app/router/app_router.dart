@@ -9,6 +9,7 @@ import '../../features/heritage/presentation/screens/theme_screen.dart';
 import '../../features/bookmarks/presentation/screens/bookmarks_screen.dart';
 import '../../features/settings/presentation/screens/settings_screen.dart';
 import '../../features/ktour/presentation/screens/ktour_home_screen.dart';
+import '../../features/ktour/presentation/screens/tour_explore_screen.dart';
 import '../../features/onboarding/presentation/screens/language_selection_screen.dart';
 import '../../features/splash/presentation/screens/splash_screen.dart';
 
@@ -19,6 +20,7 @@ abstract class AppRoutes {
   static const String home = '/home';
   static const String themes = '/themes';
   static const String ktour = '/ktour';
+  static const String ktourExplore = '/ktour/explore';
   static const String bookmarks = '/bookmarks';
   static const String settings = '/settings';
   static const String heritageDetail = '/heritage/:id';
@@ -92,6 +94,14 @@ final routerProvider = Provider<GoRouter>((ref) {
             pageBuilder: (context, state) => const NoTransitionPage(
               child: KTourHomeScreen(),
             ),
+            routes: [
+              // 여행지 탐색 화면
+              GoRoute(
+                path: 'explore',
+                name: 'ktourExplore',
+                builder: (context, state) => const TourExploreScreen(),
+              ),
+            ],
           ),
           
           // 북마크 화면

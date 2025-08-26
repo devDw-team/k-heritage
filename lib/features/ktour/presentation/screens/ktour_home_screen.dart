@@ -1,14 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import '../../application/ktour_controller.dart';
+import '../../application/ktour_state.dart';
+import '../../domain/entities/tour_attraction.dart';
+import '../../domain/entities/tour_festival.dart';
 
 /// K-TOUR 메인 화면
-class KTourHomeScreen extends ConsumerWidget {
+class KTourHomeScreen extends ConsumerStatefulWidget {
   const KTourHomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<KTourHomeScreen> createState() => _KTourHomeScreenState();
+}
+
+class _KTourHomeScreenState extends ConsumerState<KTourHomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // 초기 데이터 로드는 Controller의 생성자에서 처리
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final state = ref.watch(ktourControllerProvider);
+    final controller = ref.read(ktourControllerProvider.notifier);
     
     return Scaffold(
       appBar: AppBar(
@@ -17,10 +35,16 @@ class KTourHomeScreen extends ConsumerWidget {
         elevation: 0,
         backgroundColor: Colors.transparent,
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+      body: RefreshIndicator(
+        onRefresh: () => controller.refresh(),
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 초기화 중 표시
+              if (state.isInitializing)
+                const LinearProgressIndicator(),
             // 헤더 배너
             Container(
               height: 180,
@@ -114,10 +138,7 @@ class KTourHomeScreen extends ConsumerWidget {
                         subtitle: '지역별·테마별 관광지',
                         color: Colors.blue,
                         onTap: () {
-                          // TODO: 여행지 탐색 화면으로 이동
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('여행지 탐색 기능 준비중')),
-                          );
+                          context.push('/ktour/explore');
                         },
                       ),
                       _buildMenuCard(
@@ -168,15 +189,16 @@ class KTourHomeScreen extends ConsumerWidget {
             const SizedBox(height: 24),
             
             // 인기 여행지 섹션
-            _buildPopularSection(context),
+            _buildPopularSection(context, state),
             
             const SizedBox(height: 24),
             
             // 진행중인 축제 섹션
-            _buildFestivalSection(context),
+            _buildFestivalSection(context, state),
             
             const SizedBox(height: 80), // 하단 네비게이션 공간
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -241,7 +263,7 @@ class KTourHomeScreen extends ConsumerWidget {
     );
   }
   
-  Widget _buildPopularSection(BuildContext context) {
+  Widget _buildPopularSection(BuildContext context, KTourState state) {
     final theme = Theme.of(context);
     
     return Column(
@@ -260,7 +282,7 @@ class KTourHomeScreen extends ConsumerWidget {
               ),
               TextButton(
                 onPressed: () {
-                  // TODO: 전체보기
+                  context.push('/ktour/explore');
                 },
                 child: const Text('전체보기'),
               ),
@@ -270,70 +292,126 @@ class KTourHomeScreen extends ConsumerWidget {
         const SizedBox(height: 12),
         SizedBox(
           height: 200,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            itemCount: 5,
-            itemBuilder: (context, index) {
-              return Container(
-                width: 150,
-                margin: const EdgeInsets.only(right: 12),
+          child: state.isLoadingPopular
+              ? const Center(child: CircularProgressIndicator())
+              : state.popularError != null
+                  ? Center(
+                      child: Text(
+                        state.popularError!,
+                        style: TextStyle(color: theme.colorScheme.error),
+                      ),
+                    )
+                  : state.popularAttractions.isEmpty
+                      ? const Center(child: Text('인기 여행지가 없습니다'))
+                      : ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          itemCount: state.popularAttractions.length,
+                          itemBuilder: (context, index) {
+                            final attraction = state.popularAttractions[index];
+                            return _buildAttractionCard(context, attraction);
+                          },
+                        ),
+        ),
+      ],
+    );
+  }
+  
+  Widget _buildAttractionCard(BuildContext context, TourAttraction attraction) {
+    return Container(
+      width: 150,
+      margin: const EdgeInsets.only(right: 12),
+      child: InkWell(
+        onTap: () {
+          // TODO: 상세 화면으로 이동
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('${attraction.title} 선택됨')),
+          );
+        },
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            color: Colors.grey.shade200,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 이미지
+              Container(
+                height: 120,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  color: Colors.grey.shade200,
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(12),
+                  ),
+                  color: Colors.grey.shade300,
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      height: 120,
-                      decoration: BoxDecoration(
+                child: attraction.hasImage
+                    ? ClipRRect(
                         borderRadius: const BorderRadius.vertical(
                           top: Radius.circular(12),
                         ),
-                        color: Colors.grey.shade300,
-                      ),
-                      child: const Center(
+                        child: CachedNetworkImage(
+                          imageUrl: attraction.firstImage2 ?? attraction.firstImage!,
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          height: double.infinity,
+                          placeholder: (context, url) => const Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                          errorWidget: (context, url, error) => const Center(
+                            child: Icon(
+                              Icons.image_not_supported,
+                              size: 40,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ),
+                      )
+                    : const Center(
                         child: Icon(
                           Icons.image,
                           size: 40,
                           color: Colors.grey,
                         ),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '여행지 ${index + 1}',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            '서울특별시',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey.shade600,
-                            ),
-                          ),
-                        ],
+              ),
+              // 정보
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        attraction.title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                        ),
                       ),
-                    ),
-                  ],
+                      const Spacer(),
+                      Text(
+                        attraction.address1?.split(' ').take(2).join(' ') ?? '',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              );
-            },
+              ),
+            ],
           ),
         ),
-      ],
+      ),
     );
   }
   
-  Widget _buildFestivalSection(BuildContext context) {
+  Widget _buildFestivalSection(BuildContext context, KTourState state) {
     final theme = Theme.of(context);
     
     return Column(
@@ -352,7 +430,10 @@ class KTourHomeScreen extends ConsumerWidget {
               ),
               TextButton(
                 onPressed: () {
-                  // TODO: 전체보기
+                  // TODO: 전체보기 - 축제 목록 화면으로 이동
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('축제 목록 화면 준비중')),
+                  );
                 },
                 child: const Text('전체보기'),
               ),
@@ -360,38 +441,119 @@ class KTourHomeScreen extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: 12),
-        ListView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          itemCount: 3,
-          itemBuilder: (context, index) {
-            return Card(
-              margin: const EdgeInsets.only(bottom: 12),
-              child: ListTile(
-                leading: Container(
-                  width: 60,
-                  height: 60,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    color: Colors.orange.shade100,
+        state.isLoadingFestivals
+            ? const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(20),
+                  child: CircularProgressIndicator(),
+                ),
+              )
+            : state.festivalsError != null
+                ? Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Text(
+                        state.festivalsError!,
+                        style: TextStyle(color: theme.colorScheme.error),
+                      ),
+                    ),
+                  )
+                : state.ongoingFestivals.isEmpty
+                    ? const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(20),
+                          child: Text('진행중인 축제가 없습니다'),
+                        ),
+                      )
+                    : ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        itemCount: state.ongoingFestivals.take(3).length,
+                        itemBuilder: (context, index) {
+                          final festival = state.ongoingFestivals[index];
+                          return _buildFestivalCard(context, festival);
+                        },
+                      ),
+      ],
+    );
+  }
+  
+  Widget _buildFestivalCard(BuildContext context, TourFestival festival) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: ListTile(
+        leading: Container(
+          width: 60,
+          height: 60,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            color: Colors.orange.shade100,
+          ),
+          child: festival.hasImage
+              ? ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: CachedNetworkImage(
+                    imageUrl: festival.firstImage2 ?? festival.firstImage!,
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: double.infinity,
+                    placeholder: (context, url) => Icon(
+                      Icons.festival,
+                      color: Colors.orange.shade700,
+                    ),
+                    errorWidget: (context, url, error) => Icon(
+                      Icons.festival,
+                      color: Colors.orange.shade700,
+                    ),
                   ),
-                  child: Icon(
-                    Icons.festival,
-                    color: Colors.orange.shade700,
+                )
+              : Icon(
+                  Icons.festival,
+                  color: Colors.orange.shade700,
+                ),
+        ),
+        title: Text(
+          festival.title,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        subtitle: Text(
+          festival.periodDisplay.isNotEmpty 
+            ? festival.periodDisplay
+            : festival.eventPlace ?? '',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        trailing: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (festival.dDayDisplay != null)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.orange,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  festival.dDayDisplay!,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-                title: Text('축제 ${index + 1}'),
-                subtitle: const Text('2025.01.01 ~ 2025.01.31'),
-                trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                onTap: () {
-                  // TODO: 축제 상세
-                },
               ),
-            );
-          },
+            const Icon(Icons.arrow_forward_ios, size: 16),
+          ],
         ),
-      ],
+        onTap: () {
+          // TODO: 축제 상세 화면으로 이동
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('${festival.title} 선택됨')),
+          );
+        },
+      ),
     );
   }
 }
