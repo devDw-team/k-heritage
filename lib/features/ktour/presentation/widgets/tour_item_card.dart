@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import '../../../../core/utils/logger.dart';
+import '../../application/ktour_controller.dart';
 import '../../domain/entities/tour_attraction.dart';
 import '../../infrastructure/datasources/tour_api_datasource.dart';
 
 /// 관광지 아이템 카드 위젯
-class TourItemCard extends StatelessWidget {
+class TourItemCard extends ConsumerStatefulWidget {
   final TourAttraction attraction;
   final bool showDistance;
   final VoidCallback onTap;
@@ -15,6 +18,52 @@ class TourItemCard extends StatelessWidget {
     this.showDistance = false,
     required this.onTap,
   });
+  
+  @override
+  ConsumerState<TourItemCard> createState() => _TourItemCardState();
+}
+
+class _TourItemCardState extends ConsumerState<TourItemCard> {
+  late bool _isBookmarked;
+  
+  @override
+  void initState() {
+    super.initState();
+    _isBookmarked = widget.attraction.isBookmarked == true;
+  }
+  
+  Future<void> _toggleBookmark() async {
+    try {
+      final repository = ref.read(ktourRepositoryProvider);
+      final newBookmarkStatus = !_isBookmarked;
+      
+      await repository.toggleBookmark(
+        contentId: widget.attraction.contentId,
+      );
+      
+      setState(() {
+        _isBookmarked = newBookmarkStatus;
+      });
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(newBookmarkStatus ? '북마크에 추가되었습니다' : '북마크에서 제거되었습니다'),
+            duration: const Duration(seconds: 1),
+          ),
+        );
+      }
+    } catch (e) {
+      Log.e('Failed to toggle bookmark', error: e);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('북마크 설정 중 오류가 발생했습니다'),
+          ),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,32 +73,57 @@ class TourItemCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: onTap,
+        onTap: widget.onTap,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 이미지
-            if (attraction.firstImage != null && attraction.firstImage!.isNotEmpty)
-              AspectRatio(
-                aspectRatio: 16 / 9,
-                child: CachedNetworkImage(
-                  imageUrl: attraction.firstImage!,
-                  fit: BoxFit.cover,
-                  placeholder: (context, url) => Container(
-                    color: theme.colorScheme.surfaceVariant,
-                    child: const Center(
-                      child: CircularProgressIndicator(strokeWidth: 2),
+            // 이미지와 북마크 버튼
+            if (widget.attraction.firstImage != null && widget.attraction.firstImage!.isNotEmpty)
+              Stack(
+                children: [
+                  AspectRatio(
+                    aspectRatio: 16 / 9,
+                    child: CachedNetworkImage(
+                      imageUrl: widget.attraction.firstImage!,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => Container(
+                        color: theme.colorScheme.surfaceVariant,
+                        child: const Center(
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      ),
+                      errorWidget: (context, url, error) => Container(
+                        color: theme.colorScheme.surfaceVariant,
+                        child: Icon(
+                          Icons.image_not_supported,
+                          size: 48,
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
                     ),
                   ),
-                  errorWidget: (context, url, error) => Container(
-                    color: theme.colorScheme.surfaceVariant,
-                    child: Icon(
-                      Icons.image_not_supported,
-                      size: 48,
-                      color: theme.colorScheme.onSurfaceVariant,
+                  // 북마크 버튼
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Material(
+                      color: Colors.white.withOpacity(0.9),
+                      shape: const CircleBorder(),
+                      child: InkWell(
+                        onTap: _toggleBookmark,
+                        customBorder: const CircleBorder(),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8),
+                          child: Icon(
+                            _isBookmarked ? Icons.bookmark : Icons.bookmark_border,
+                            size: 20,
+                            color: _isBookmarked ? theme.colorScheme.primary : Colors.black54,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                ],
               ),
             
             // 컨텐츠
@@ -59,20 +133,20 @@ class TourItemCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // 카테고리 태그
-                  if (attraction.contentTypeId != null)
+                  if (widget.attraction.contentTypeId != null)
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: _getTypeColor(attraction.contentTypeId)
+                        color: _getTypeColor(widget.attraction.contentTypeId)
                             .withOpacity(0.1),
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
-                        TourContentType.getName(attraction.contentTypeId),
+                        TourContentType.getName(widget.attraction.contentTypeId),
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
-                          color: _getTypeColor(attraction.contentTypeId),
+                          color: _getTypeColor(widget.attraction.contentTypeId),
                         ),
                       ),
                     ),
@@ -80,7 +154,7 @@ class TourItemCard extends StatelessWidget {
                   
                   // 제목
                   Text(
-                    attraction.title,
+                    widget.attraction.title,
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -90,7 +164,7 @@ class TourItemCard extends StatelessWidget {
                   const SizedBox(height: 4),
                   
                   // 주소
-                  if (attraction.address1 != null)
+                  if (widget.attraction.address1 != null)
                     Row(
                       children: [
                         Icon(
@@ -101,7 +175,7 @@ class TourItemCard extends StatelessWidget {
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
-                            attraction.address1!,
+                            widget.attraction.address1!,
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: theme.colorScheme.onSurfaceVariant,
                             ),
@@ -112,32 +186,31 @@ class TourItemCard extends StatelessWidget {
                       ],
                     ),
                   
-                  // 거리 표시 (dist 필드가 없으므로 주석 처리)
-                  // TODO: API에서 거리 정보를 받아올 때 활성화
-                  // if (showDistance && attraction.dist != null)
-                  //   Padding(
-                  //     padding: const EdgeInsets.only(top: 4),
-                  //     child: Row(
-                  //       children: [
-                  //         Icon(
-                  //           Icons.straighten,
-                  //           size: 14,
-                  //           color: theme.colorScheme.primary,
-                  //         ),
-                  //         const SizedBox(width: 4),
-                  //         Text(
-                  //           _getDistanceText(attraction.dist!),
-                  //           style: theme.textTheme.bodySmall?.copyWith(
-                  //             color: theme.colorScheme.primary,
-                  //             fontWeight: FontWeight.w600,
-                  //           ),
-                  //         ),
-                  //       ],
-                  //     ),
-                  //   ),
+                  // 거리 표시
+                  if (widget.showDistance && widget.attraction.distance != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.straighten,
+                            size: 14,
+                            color: theme.colorScheme.primary,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            _getDistanceText(widget.attraction.distance!),
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.primary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   
                   // 전화번호
-                  if (attraction.tel != null && attraction.tel!.isNotEmpty)
+                  if (widget.attraction.tel?.isNotEmpty == true)
                     Padding(
                       padding: const EdgeInsets.only(top: 4),
                       child: Row(
@@ -150,7 +223,7 @@ class TourItemCard extends StatelessWidget {
                           const SizedBox(width: 4),
                           Expanded(
                             child: Text(
-                              attraction.tel!,
+                              widget.attraction.tel!,
                               style: theme.textTheme.bodySmall?.copyWith(
                                 color: theme.colorScheme.onSurfaceVariant,
                               ),
@@ -193,22 +266,16 @@ class TourItemCard extends StatelessWidget {
     }
   }
 
-  // TODO: 거리 정보가 추가되면 활성화
-  // String _getDistanceText(String dist) {
-  //   try {
-  //     final meters = double.parse(dist);
-  //     if (meters < 1000) {
-  //       return '${meters.toInt()}m';
-  //     } else {
-  //       final km = meters / 1000;
-  //       if (km < 10) {
-  //         return '${km.toStringAsFixed(1)}km';
-  //       } else {
-  //         return '${km.toInt()}km';
-  //       }
-  //     }
-  //   } catch (e) {
-  //     return dist;
-  //   }
-  // }
+  String _getDistanceText(double distance) {
+    if (distance < 1000) {
+      return '${distance.toInt()}m';
+    } else {
+      final km = distance / 1000;
+      if (km < 10) {
+        return '${km.toStringAsFixed(1)}km';
+      } else {
+        return '${km.toInt()}km';
+      }
+    }
+  }
 }

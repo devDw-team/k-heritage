@@ -5,7 +5,6 @@ import '../../../core/utils/logger.dart';
 import '../../common/services/location_service.dart';
 import '../domain/entities/tour_attraction.dart';
 import '../domain/repositories/ktour_repository.dart';
-import '../infrastructure/datasources/tour_api_datasource.dart';
 import 'ktour_controller.dart';
 import 'tour_explore_state.dart';
 
@@ -426,7 +425,7 @@ class TourExploreController extends StateNotifier<TourExploreState> {
       // 정렬
       _sortResults(results);
       
-      // 페이지네이션 적용
+      // 페이지네이션 적용 (첫 페이지만 표시)
       final paginatedResults = results.take(state.pageSize).toList();
       
       state = state.copyWith(
@@ -434,6 +433,7 @@ class TourExploreController extends StateNotifier<TourExploreState> {
         attractions: paginatedResults,
         totalCount: results.length,
         hasMore: results.length > state.pageSize,
+        currentPage: 1,  // 첫 페이지로 리셋
       );
     } catch (e) {
       Log.e('Search failed', error: e);
@@ -514,20 +514,146 @@ class TourExploreController extends StateNotifier<TourExploreState> {
   
   /// 더 불러오기
   Future<void> loadMore() async {
-    if (state.isLoadingMore || !state.hasMore) return;
+    if (state.isLoadingMore || !state.hasMore || state.isLoading) return;
     
     state = state.copyWith(
       isLoadingMore: true,
-      currentPage: state.currentPage + 1,
     );
     
-    // TODO: 실제 페이지네이션 구현
-    // 현재는 단순히 hasMore를 false로 설정
-    await Future.delayed(const Duration(seconds: 1));
-    
-    state = state.copyWith(
-      isLoadingMore: false,
-      hasMore: false,
+    try {
+      List<TourAttraction> newResults = [];
+      final nextPage = state.currentPage + 1;
+      
+      switch (state.filterMode) {
+        case FilterMode.area:
+          // 지역별 검색 - 다음 페이지
+          if (state.selectedAreaCodes.isEmpty) {
+            state = state.copyWith(isLoadingMore: false);
+            return;
+          }
+          
+          final futures = <Future<List<TourAttraction>>>[];
+          for (final areaCode in state.selectedAreaCodes) {
+            final sigunguList = state.selectedSigunguCodes
+                .where((code) => code.startsWith(areaCode))
+                .toList();
+            
+            if (sigunguList.isEmpty) {
+              futures.add(_searchByAreaWithPage(areaCode, null, nextPage));
+            } else {
+              for (final sigunguCode in sigunguList) {
+                futures.add(_searchByAreaWithPage(areaCode, sigunguCode, nextPage));
+              }
+            }
+          }
+          
+          final allResults = await Future.wait(futures);
+          newResults = allResults.expand((list) => list).toList();
+          break;
+          
+        case FilterMode.theme:
+          // 테마별 검색 - 다음 페이지
+          if (state.selectedThemes.isEmpty) {
+            state = state.copyWith(isLoadingMore: false);
+            return;
+          }
+          
+          final futures = state.selectedThemes.map((theme) =>
+            _searchByThemeWithPage(theme, nextPage)
+          ).toList();
+          
+          final allResults = await Future.wait(futures);
+          newResults = allResults.expand((list) => list).toList();
+          break;
+          
+        case FilterMode.nearby:
+          // 내 주변 검색 - 다음 페이지
+          if (!state.hasLocation) {
+            state = state.copyWith(isLoadingMore: false);
+            return;
+          }
+          
+          newResults = await _searchNearbyWithPage(nextPage);
+          break;
+      }
+      
+      // 검색어 필터링
+      if (state.searchKeyword.isNotEmpty) {
+        final keyword = state.searchKeyword.toLowerCase();
+        newResults = newResults.where((item) =>
+          item.title.toLowerCase().contains(keyword) ||
+          (item.address1?.toLowerCase().contains(keyword) ?? false) ||
+          (item.cat3?.toLowerCase().contains(keyword) ?? false)
+        ).toList();
+      }
+      
+      // 정렬
+      _sortResults(newResults);
+      
+      // 기존 결과와 병합
+      final combinedResults = [...state.attractions, ...newResults];
+      
+      state = state.copyWith(
+        isLoadingMore: false,
+        attractions: combinedResults,
+        currentPage: nextPage,
+        hasMore: newResults.length >= state.pageSize,
+      );
+    } catch (e) {
+      Log.e('Load more failed', error: e);
+      state = state.copyWith(
+        isLoadingMore: false,
+        error: '추가 데이터를 불러오는 중 오류가 발생했습니다',
+      );
+    }
+  }
+  
+  /// 지역별 검색 (페이지 지정)
+  Future<List<TourAttraction>> _searchByAreaWithPage(String areaCode, String? sigunguCode, int pageNo) async {
+    if (state.searchKeyword.isNotEmpty) {
+      return await _repository.searchAttractions(
+        keyword: state.searchKeyword,
+        areaCode: areaCode,
+        sigunguCode: sigunguCode,
+        pageNo: pageNo,
+        numOfRows: state.pageSize,
+      );
+    } else {
+      return await _repository.getAttractionsByArea(
+        areaCode: areaCode,
+        sigunguCode: sigunguCode,
+        pageNo: pageNo,
+        numOfRows: state.pageSize,
+      );
+    }
+  }
+  
+  /// 테마별 검색 (페이지 지정)
+  Future<List<TourAttraction>> _searchByThemeWithPage(int contentTypeId, int pageNo) async {
+    if (state.searchKeyword.isNotEmpty) {
+      return await _repository.searchAttractions(
+        keyword: state.searchKeyword,
+        contentTypeId: contentTypeId,
+        pageNo: pageNo,
+        numOfRows: state.pageSize,
+      );
+    } else {
+      return await _repository.getAttractionsByArea(
+        contentTypeId: contentTypeId,
+        pageNo: pageNo,
+        numOfRows: state.pageSize,
+      );
+    }
+  }
+  
+  /// 내 주변 검색 (페이지 지정)
+  Future<List<TourAttraction>> _searchNearbyWithPage(int pageNo) async {
+    return await _repository.getNearbyAttractions(
+      latitude: state.currentLatitude!,
+      longitude: state.currentLongitude!,
+      radius: state.radius,
+      pageNo: pageNo,
+      numOfRows: state.pageSize,
     );
   }
   

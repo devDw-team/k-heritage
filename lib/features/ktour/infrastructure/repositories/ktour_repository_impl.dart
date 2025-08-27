@@ -1,9 +1,12 @@
+import 'dart:convert';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../core/utils/logger.dart';
 import '../../domain/entities/tour_attraction.dart';
 import '../../domain/entities/tour_festival.dart';
 import '../../domain/entities/tour_stay.dart';
+import '../../domain/entities/bookmark_item.dart';
 import '../../domain/repositories/ktour_repository.dart';
 import '../datasources/tour_api_datasource.dart';
 
@@ -150,7 +153,7 @@ class KTourRepositoryImpl implements KTourRepository {
         keyword: keyword,
         areaCode: areaCode,
         sigunguCode: sigunguCode,
-        contentTypeId: contentTypeId?.toString(),
+        contentTypeId: (contentTypeId != null && contentTypeId > 0) ? contentTypeId.toString() : null,
         pageNo: pageNo,
         numOfRows: numOfRows,
       );
@@ -174,29 +177,45 @@ class KTourRepositoryImpl implements KTourRepository {
     int? contentTypeId,
   }) async {
     try {
+      Log.d('Getting attraction detail - contentId: $contentId, contentTypeId: $contentTypeId');
+      
       final cacheKey = _buildCacheKey('attraction_detail', {'id': contentId});
       
       // 캐시 확인
       final cached = _getCachedItem<TourAttraction>(cacheKey);
-      if (cached != null) return cached;
+      if (cached != null) {
+        Log.d('Returning cached attraction detail for $contentId');
+        return cached;
+      }
       
       // 공통 정보 조회
+      Log.d('Fetching attraction detail from API for $contentId, contentTypeId: $contentTypeId');
+      
+      // detailCommon2 사용 - contentTypeId 파라미터 없이
       final commonData = await _tourAPI.getDetailCommon(
         contentId: contentId,
-        contentTypeId: contentTypeId?.toString(),
+        contentTypeId: null,  // detailCommon2는 contentTypeId 파라미터 없이 사용
       );
       
-      if (commonData.isEmpty) return null;
+      if (commonData.isEmpty) {
+        Log.w('No data returned for contentId: $contentId');
+        return null;
+      }
       
+      Log.d('Common data received, creating attraction object');
       // 기본 정보 생성
       var attraction = TourAttraction.fromApiResponse(commonData);
       
+      // API 응답에서 contentTypeId 추출
+      final responseContentTypeId = commonData['contenttypeid']?.toString();
+      final typeIdForIntro = responseContentTypeId ?? contentTypeId?.toString();
+      
       // 소개 정보 조회 (contentTypeId 필요)
-      if (contentTypeId != null) {
+      if (typeIdForIntro != null && typeIdForIntro.isNotEmpty && typeIdForIntro != '0') {
         try {
           final introData = await _tourAPI.getDetailIntro(
             contentId: contentId,
-            contentTypeId: contentTypeId.toString(),
+            contentTypeId: typeIdForIntro,
           );
           
           // 소개 정보 병합
@@ -334,10 +353,10 @@ class KTourRepositoryImpl implements KTourRepository {
       final cached = _getCachedItem<TourFestival>(cacheKey);
       if (cached != null) return cached;
       
-      // 공통 정보 조회
+      // 공통 정보 조회 (detailCommon2 사용)
       final commonData = await _tourAPI.getDetailCommon(
         contentId: contentId,
-        contentTypeId: TourContentType.festival.toString(),
+        contentTypeId: null,  // detailCommon2는 contentTypeId 파라미터 없이 사용
       );
       
       if (commonData.isEmpty) return null;
@@ -602,6 +621,29 @@ class KTourRepositoryImpl implements KTourRepository {
   }
   
   @override
+  Future<void> toggleBookmark({required String contentId}) async {
+    final key = '$_bookmarkKeyPrefix$contentId';
+    if (_prefs.containsKey(key)) {
+      await _prefs.remove(key);
+    } else {
+      await _prefs.setString(key, 'attraction');
+    }
+  }
+  
+  @override
+  Future<void> setBookmark({
+    required String contentId,
+    required bool isBookmarked,
+  }) async {
+    final key = '$_bookmarkKeyPrefix$contentId';
+    if (isBookmarked) {
+      await _prefs.setString(key, 'attraction');
+    } else {
+      await _prefs.remove(key);
+    }
+  }
+  
+  @override
   Future<void> clearCache() async {
     final keys = _prefs.getKeys();
     for (final key in keys) {
@@ -609,6 +651,64 @@ class KTourRepositoryImpl implements KTourRepository {
         await _prefs.remove(key);
       }
     }
+  }
+  
+  @override
+  Future<void> saveBookmarkWithDetails({
+    required BookmarkItem bookmarkItem,
+  }) async {
+    try {
+      final key = '${_bookmarkKeyPrefix}details_${bookmarkItem.contentId}';
+      final json = bookmarkItem.toJson();
+      await _prefs.setString(key, jsonEncode(json));
+      
+      // 기존 북마크 ID도 저장 (호환성 유지)
+      final idKey = '$_bookmarkKeyPrefix${bookmarkItem.contentId}';
+      await _prefs.setString(idKey, bookmarkItem.bookmarkType);
+      
+      Log.d('Saved bookmark details for ${bookmarkItem.contentId}');
+    } catch (e) {
+      Log.e('Failed to save bookmark details', error: e);
+      rethrow;
+    }
+  }
+  
+  @override
+  Future<List<BookmarkItem>> getBookmarkedAttractions() async {
+    try {
+      final keys = _prefs.getKeys();
+      final bookmarkKeys = keys
+          .where((key) => key.startsWith('${_bookmarkKeyPrefix}details_'))
+          .toList();
+      
+      final bookmarks = <BookmarkItem>[];
+      for (final key in bookmarkKeys) {
+        final jsonStr = _prefs.getString(key);
+        if (jsonStr != null) {
+          try {
+            final json = jsonDecode(jsonStr) as Map<String, dynamic>;
+            bookmarks.add(BookmarkItem.fromJson(json));
+          } catch (e) {
+            Log.w('Failed to parse bookmark: $key', error: e);
+          }
+        }
+      }
+      
+      // 최신 북마크 먼저 표시
+      bookmarks.sort((a, b) => b.bookmarkedAt.compareTo(a.bookmarkedAt));
+      
+      Log.d('Loaded ${bookmarks.length} bookmarked items');
+      return bookmarks;
+    } catch (e) {
+      Log.e('Failed to get bookmarked attractions', error: e);
+      return [];
+    }
+  }
+  
+  @override
+  Future<bool> isBookmarked(String contentId) async {
+    final key = '$_bookmarkKeyPrefix$contentId';
+    return _prefs.containsKey(key);
   }
   
   // ===== 헬퍼 메서드들 =====
@@ -728,3 +828,34 @@ class KTourRepositoryImpl implements KTourRepository {
     }
   }
 }
+
+/// SharedPreferences 싱글톤 인스턴스 (임시)
+SharedPreferences? _sharedPreferencesInstance;
+
+/// SharedPreferences 프로바이더 (앱 초기화 시 설정 필요)
+final sharedPreferencesProvider = Provider<SharedPreferences>((ref) {
+  if (_sharedPreferencesInstance != null) {
+    return _sharedPreferencesInstance!;
+  }
+  throw UnimplementedError('sharedPreferencesProvider must be initialized on app startup');
+});
+
+/// SharedPreferences 초기화 함수
+Future<void> initializeSharedPreferences() async {
+  _sharedPreferencesInstance = await SharedPreferences.getInstance();
+}
+
+/// KTour Repository 프로바이더
+final ktourRepositoryProvider = FutureProvider<KTourRepository>((ref) async {
+  final tourAPI = ref.watch(tourAPIDataSourceProvider);
+  
+  // SharedPreferences 초기화 확인
+  if (_sharedPreferencesInstance == null) {
+    await initializeSharedPreferences();
+  }
+  
+  return KTourRepositoryImpl(
+    tourAPI: tourAPI, 
+    prefs: _sharedPreferencesInstance!,
+  );
+});

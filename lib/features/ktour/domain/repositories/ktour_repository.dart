@@ -1,6 +1,7 @@
 import '../entities/tour_attraction.dart';
 import '../entities/tour_festival.dart';
 import '../entities/tour_stay.dart';
+import '../entities/bookmark_item.dart';
 
 /// K-TOUR Repository 인터페이스
 abstract class KTourRepository {
@@ -124,6 +125,28 @@ abstract class KTourRepository {
   
   /// 북마크 목록 조회
   Future<List<String>> getBookmarkIds();
+  
+  /// 북마크 토글
+  Future<void> toggleBookmark({
+    required String contentId,
+  });
+  
+  /// 북마크 설정
+  Future<void> setBookmark({
+    required String contentId,
+    required bool isBookmarked,
+  });
+  
+  /// 북마크와 상세 정보 저장
+  Future<void> saveBookmarkWithDetails({
+    required BookmarkItem bookmarkItem,
+  });
+  
+  /// 북마크된 관광지 목록 조회
+  Future<List<BookmarkItem>> getBookmarkedAttractions();
+  
+  /// 특정 항목이 북마크되었는지 확인
+  Future<bool> isBookmarked(String contentId);
   
   /// 캐시 클리어
   Future<void> clearCache();

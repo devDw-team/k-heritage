@@ -10,6 +10,7 @@ import '../../features/bookmarks/presentation/screens/bookmarks_screen.dart';
 import '../../features/settings/presentation/screens/settings_screen.dart';
 import '../../features/ktour/presentation/screens/ktour_home_screen.dart';
 import '../../features/ktour/presentation/screens/tour_explore_screen.dart';
+import '../../features/ktour/presentation/screens/tour_detail_screen.dart';
 import '../../features/onboarding/presentation/screens/language_selection_screen.dart';
 import '../../features/splash/presentation/screens/splash_screen.dart';
 
@@ -21,6 +22,7 @@ abstract class AppRoutes {
   static const String themes = '/themes';
   static const String ktour = '/ktour';
   static const String ktourExplore = '/ktour/explore';
+  static const String ktourDetail = '/ktour/detail/:contentId';
   static const String bookmarks = '/bookmarks';
   static const String settings = '/settings';
   static const String heritageDetail = '/heritage/:id';
@@ -133,6 +135,31 @@ final routerProvider = Provider<GoRouter>((ref) {
           return HeritageDetailScreen(heritageId: heritageId);
         },
       ),
+      
+      // 관광지 상세 화면 (전체 화면)
+      GoRoute(
+        path: AppRoutes.ktourDetail,
+        name: 'ktourDetail',
+        builder: (context, state) {
+          final contentId = state.pathParameters['contentId'] ?? '';
+          final contentTypeIdStr = state.uri.queryParameters['contentTypeId'];
+          
+          // contentTypeId 파싱 및 검증
+          int? contentTypeId;
+          if (contentTypeIdStr != null) {
+            final parsed = int.tryParse(contentTypeIdStr);
+            // 0보다 큰 유효한 값만 사용
+            if (parsed != null && parsed > 0) {
+              contentTypeId = parsed;
+            }
+          }
+          
+          return TourDetailScreen(
+            contentId: contentId,
+            contentTypeId: contentTypeId,
+          );
+        },
+      ),
     ],
     
     // 에러 페이지
@@ -203,6 +230,12 @@ extension NavigationHelper on BuildContext {
   
   /// 문화재 상세 화면으로 이동
   void goHeritageDetail(String id) => push('/heritage/$id');
+  
+  /// 관광지 상세 화면으로 이동
+  void goTourDetail(String contentId, {int? contentTypeId}) {
+    final queryParams = contentTypeId != null ? '?contentTypeId=$contentTypeId' : '';
+    push('/ktour/detail/$contentId$queryParams');
+  }
   
   /// 언어 선택 화면으로 이동
   void goLanguageSelection() => go(AppRoutes.languageSelection);

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/utils/logger.dart';
 
 /// Tour API 4.0 DataSource
@@ -12,8 +13,8 @@ class TourAPIDataSource {
   late final bool _useDummyData; // 개발용 더미 데이터 사용 여부
 
   TourAPIDataSource({Dio? dio, bool? useDummyData}) 
-      : _dio = dio ?? Dio(),
-        _useDummyData = useDummyData ?? false {
+      : _dio = dio ?? Dio() {
+    _useDummyData = useDummyData ?? false;
     _serviceKey = dotenv.env['TOUR_API_SERVICE_KEY'] ?? '';
     
     // 서비스 키가 없거나 유효하지 않은 경우 더미 데이터 모드 활성화
@@ -171,7 +172,14 @@ class TourAPIDataSource {
       
       if (areaCode != null) params['areaCode'] = areaCode;
       if (sigunguCode != null) params['sigunguCode'] = sigunguCode;
-      if (contentTypeId != null) params['contentTypeId'] = contentTypeId;
+      
+      // contentTypeId 검증
+      if (contentTypeId != null && contentTypeId.isNotEmpty && contentTypeId != '0') {
+        final typeId = int.tryParse(contentTypeId);
+        if (typeId != null && typeId > 0) {
+          params['contentTypeId'] = contentTypeId;
+        }
+      }
       if (cat1 != null) params['cat1'] = cat1;
       if (cat2 != null) params['cat2'] = cat2;
       if (cat3 != null) params['cat3'] = cat3;
@@ -201,7 +209,13 @@ class TourAPIDataSource {
       params['radius'] = radius.toString();
       params['arrange'] = arrange;
       
-      if (contentTypeId != null) params['contentTypeId'] = contentTypeId;
+      // contentTypeId 검증
+      if (contentTypeId != null && contentTypeId.isNotEmpty && contentTypeId != '0') {
+        final typeId = int.tryParse(contentTypeId);
+        if (typeId != null && typeId > 0) {
+          params['contentTypeId'] = contentTypeId;
+        }
+      }
 
       final response = await _dio.get('/locationBasedList2', queryParameters: params);
       return _parseResponse(response);
@@ -226,7 +240,13 @@ class TourAPIDataSource {
       params['keyword'] = keyword;
       params['arrange'] = arrange;
       
-      if (contentTypeId != null) params['contentTypeId'] = contentTypeId;
+      // contentTypeId 검증
+      if (contentTypeId != null && contentTypeId.isNotEmpty && contentTypeId != '0') {
+        final typeId = int.tryParse(contentTypeId);
+        if (typeId != null && typeId > 0) {
+          params['contentTypeId'] = contentTypeId;
+        }
+      }
       if (areaCode != null) params['areaCode'] = areaCode;
       if (sigunguCode != null) params['sigunguCode'] = sigunguCode;
 
@@ -305,23 +325,47 @@ class TourAPIDataSource {
     bool overviewYN = true,
   }) async {
     try {
-      final params = _getCommonParams();
-      params['contentId'] = contentId;
-      if (contentTypeId != null) params['contentTypeId'] = contentTypeId;
+      // 디버그 로그
+      Log.d('=== Detail Common Request START ===');
+      Log.d('Input contentId: "$contentId"');
+      Log.d('Input contentTypeId: "$contentTypeId"');
       
-      params['defaultYN'] = defaultYN ? 'Y' : 'N';
-      params['firstImageYN'] = firstImageYN ? 'Y' : 'N';
-      params['areacodeYN'] = areacodeYN ? 'Y' : 'N';
-      params['catcodeYN'] = catcodeYN ? 'Y' : 'N';
-      params['addrinfoYN'] = addrinfoYN ? 'Y' : 'N';
-      params['mapinfoYN'] = mapinfoYN ? 'Y' : 'N';
-      params['overviewYN'] = overviewYN ? 'Y' : 'N';
-
-      final response = await _dio.get('/detailCommon2', queryParameters: params);
+      // 기본 파라미터 설정
+      final Map<String, dynamic> params = {};
+      
+      // 서비스 키 및 필수 파라미터 (공통)
+      final commonParams = _getCommonParams();
+      params.addAll(commonParams);
+      
+      // 필수: contentId
+      params['contentId'] = contentId;
+      
+      // detailCommon2 사용 - contentTypeId 파라미터 없이
+      // detailCommon2는 contentTypeId를 파라미터로 받지 않고 응답에 포함시킴
+      String endpoint = '/detailCommon2';
+      
+      // detailCommon2에서는 YN 파라미터와 contentTypeId 모두 사용 안 함
+      
+      // 최종 파라미터 확인 (서비스 키 제외)
+      Log.d('Final endpoint: $endpoint');
+      Log.d('Final params (no key): ${params.entries.where((e) => e.key != 'serviceKey').map((e) => '${e.key}=${e.value}').join('&')}');
+      
+      // API 호출
+      final response = await _dio.get(endpoint, queryParameters: params);
       final items = _parseResponse(response);
+      
+      Log.d('Response items count: ${items.length}');
+      if (items.isNotEmpty) {
+        final item = items.first;
+        Log.d('First item has contentTypeId: ${item['contenttypeid']}');
+      }
+      
       return items.isNotEmpty ? items.first : {};
     } catch (e) {
-      Log.e('Failed to fetch detail common', error: e);
+      Log.e('Failed to fetch detail common for contentId: $contentId', error: e);
+      if (e is TourAPIException) {
+        Log.e('TourAPIException - Code: ${e.code}, Message: ${e.message}');
+      }
       rethrow;
     }
   }
@@ -332,6 +376,19 @@ class TourAPIDataSource {
     required String contentTypeId,
   }) async {
     try {
+      // contentTypeId 검증
+      if (contentTypeId.isEmpty || contentTypeId == '0') {
+        Log.w('getDetailIntro called with invalid contentTypeId: "$contentTypeId"');
+        return {};
+      }
+      
+      // 숫자로 변환해서 유효한지 확인
+      final typeId = int.tryParse(contentTypeId);
+      if (typeId == null || typeId <= 0) {
+        Log.w('getDetailIntro - Invalid contentTypeId value: "$contentTypeId"');
+        return {};
+      }
+      
       final params = _getCommonParams();
       params['contentId'] = contentId;
       params['contentTypeId'] = contentTypeId;
@@ -351,6 +408,19 @@ class TourAPIDataSource {
     required String contentTypeId,
   }) async {
     try {
+      // contentTypeId 검증
+      if (contentTypeId.isEmpty || contentTypeId == '0') {
+        Log.w('getDetailInfo called with invalid contentTypeId: "$contentTypeId"');
+        return [];
+      }
+      
+      // 숫자로 변환해서 유효한지 확인
+      final typeId = int.tryParse(contentTypeId);
+      if (typeId == null || typeId <= 0) {
+        Log.w('getDetailInfo - Invalid contentTypeId value: "$contentTypeId"');
+        return [];
+      }
+      
       final params = _getCommonParams(numOfRows: 100);
       params['contentId'] = contentId;
       params['contentTypeId'] = contentTypeId;
@@ -415,14 +485,17 @@ class TourAPIDataSource {
           final code = codeMatch?.group(1) ?? 'UNKNOWN';
           final msg = msgMatch?.group(1) ?? 'Unknown error';
           
+          Log.e('Tour API XML Error - Code: $code, Message: $msg');
+          
           if (code != '0000' && code != '00') {
             throw TourAPIException(code: code, message: msg);
           }
         }
         
-        // JSON이 아닌 XML 응답은 빈 리스트 반환
-        Log.w('Tour API returned XML instead of JSON. Check service key encoding.');
-        return [];
+        // JSON이 아닌 XML 응답은 에러로 처리
+        Log.e('Tour API returned XML instead of JSON. Check _type parameter.');
+        Log.d('XML Response preview: ${data.substring(0, 500.clamp(0, data.length))}');
+        throw TourAPIException(code: 'FORMAT_ERROR', message: 'API returned XML instead of JSON');
       }
       
       // 문자열인 경우 JSON 파싱
@@ -430,12 +503,20 @@ class TourAPIDataSource {
         data = json.decode(data);
       }
       
+      // response 구조 확인
+      if (data['response'] == null) {
+        Log.e('Invalid JSON structure - no response field');
+        Log.d('JSON data: ${json.encode(data)}');
+        throw TourAPIException(code: 'INVALID_RESPONSE', message: 'Invalid API response structure');
+      }
+      
       // 오류 체크
-      if (data['response']?['header']?['resultCode'] != '0000' &&
-          data['response']?['header']?['resultCode'] != '00') {
+      final resultCode = data['response']?['header']?['resultCode'];
+      if (resultCode != '0000' && resultCode != '00') {
         final errorMsg = data['response']?['header']?['resultMsg'] ?? 'Unknown error';
+        Log.e('Tour API Error - Code: $resultCode, Message: $errorMsg');
         throw TourAPIException(
-          code: data['response']?['header']?['resultCode'] ?? 'UNKNOWN',
+          code: resultCode ?? 'UNKNOWN',
           message: errorMsg,
         );
       }
@@ -456,9 +537,14 @@ class TourAPIDataSource {
       Log.e('Failed to parse response', error: e);
       Log.d('Response data type: ${response.data.runtimeType}');
       if (response.data is String) {
-        Log.d('Response preview: ${(response.data as String).substring(0, 200.clamp(0, (response.data as String).length))}');
+        final preview = (response.data as String).substring(0, 500.clamp(0, (response.data as String).length));
+        Log.d('Response preview: $preview');
+        // Check if this is an authentication error in XML format
+        if ((response.data as String).contains('SERVICE_KEY_IS_NOT_REGISTERED_ERROR')) {
+          throw TourAPIException(code: 'AUTH_ERROR', message: 'Service key is not registered');
+        }
       }
-      throw TourAPIException(code: 'PARSE_ERROR', message: 'Failed to parse API response');
+      throw TourAPIException(code: 'PARSE_ERROR', message: 'Failed to parse API response: ${e.toString()}');
     }
   }
 }
@@ -544,3 +630,9 @@ class AreaCodeMapper {
     return heritageToTour[heritageCode];
   }
 }
+
+/// Tour API DataSource 프로바이더
+final tourAPIDataSourceProvider = Provider<TourAPIDataSource>((ref) {
+  final dio = Dio();
+  return TourAPIDataSource(dio: dio);
+});

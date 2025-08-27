@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../app/router/app_router.dart';
 import '../../application/tour_explore_controller.dart';
 import '../../application/tour_explore_state.dart';
 import '../widgets/area_filter_widget.dart';
@@ -274,11 +275,10 @@ class _TourExploreScreenState extends ConsumerState<TourExploreScreen>
                               attraction: attraction,
                               showDistance: state.filterMode == FilterMode.nearby,
                               onTap: () {
-                                // TODO: 상세 화면으로 이동
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text('${attraction.title} 상세 화면 준비중'),
-                                  ),
+                                // 상세 화면으로 이동
+                                context.goTourDetail(
+                                  attraction.contentId,
+                                  contentTypeId: attraction.contentTypeId,
                                 );
                               },
                             );
