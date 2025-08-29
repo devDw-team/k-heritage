@@ -120,7 +120,7 @@ class _TourExploreScreenState extends ConsumerState<TourExploreScreen>
           // 필터 영역
           AnimatedContainer(
             duration: const Duration(milliseconds: 300),
-            height: state.filterMode != FilterMode.nearby ? 120 : 100,
+            height: state.filterMode != FilterMode.nearby ? 150 : 120,
             child: TabBarView(
               controller: _tabController,
               children: [

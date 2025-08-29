@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'core/config/app_config.dart';
 import 'core/utils/logger.dart';
 import 'app/router/app_router.dart';
 import 'app/theme/app_theme.dart';
+import 'features/ktour/application/tour_course_controller.dart';
 
 void main() async {
   // Initialize Flutter binding
@@ -21,20 +23,28 @@ void main() async {
   ]);
   
   // Initialize app configuration and services
-  await _initializeApp();
+  final sharedPreferences = await _initializeApp();
   
   // Run app with Riverpod
   runApp(
-    const ProviderScope(
-      child: KHeritageExplorerApp(),
+    ProviderScope(
+      overrides: [
+        // Override SharedPreferences provider
+        sharedPreferencesProvider.overrideWithValue(sharedPreferences),
+      ],
+      child: const KHeritageExplorerApp(),
     ),
   );
 }
 
 /// Initialize app configuration and services
-Future<void> _initializeApp() async {
+Future<SharedPreferences> _initializeApp() async {
   try {
     Log.i('Starting app initialization...');
+    
+    // Initialize SharedPreferences
+    final prefs = await SharedPreferences.getInstance();
+    Log.d('SharedPreferences initialized');
     
     // Initialize app configuration (includes Supabase and dotenv)
     await AppConfig.instance.initialize();
@@ -45,6 +55,8 @@ Future<void> _initializeApp() async {
     
     // Remove native splash screen (Flutter 커스텀 스플래시가 표시됨)
     FlutterNativeSplash.remove();
+    
+    return prefs;
   } catch (e, stackTrace) {
     Log.f('Failed to initialize app', error: e, stackTrace: stackTrace);
     

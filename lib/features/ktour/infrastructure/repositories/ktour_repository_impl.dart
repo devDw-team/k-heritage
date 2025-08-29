@@ -194,7 +194,6 @@ class KTourRepositoryImpl implements KTourRepository {
       // detailCommon2 사용 - contentTypeId 파라미터 없이
       final commonData = await _tourAPI.getDetailCommon(
         contentId: contentId,
-        contentTypeId: null,  // detailCommon2는 contentTypeId 파라미터 없이 사용
       );
       
       if (commonData.isEmpty) {
@@ -356,7 +355,6 @@ class KTourRepositoryImpl implements KTourRepository {
       // 공통 정보 조회 (detailCommon2 사용)
       final commonData = await _tourAPI.getDetailCommon(
         contentId: contentId,
-        contentTypeId: null,  // detailCommon2는 contentTypeId 파라미터 없이 사용
       );
       
       if (commonData.isEmpty) return null;
@@ -511,7 +509,6 @@ class KTourRepositoryImpl implements KTourRepository {
       // 공통 정보 조회
       final commonData = await _tourAPI.getDetailCommon(
         contentId: contentId,
-        contentTypeId: TourContentType.accommodation.toString(),
       );
       
       if (commonData.isEmpty) return null;

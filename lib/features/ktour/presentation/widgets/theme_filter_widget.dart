@@ -21,50 +21,50 @@ class ThemeFilterWidget extends StatelessWidget {
       _ThemeItem(
         id: TourContentType.attraction,
         name: '관광지',
-        icon: Icons.landscape,
-        color: Colors.green,
+        icon: Icons.attractions,
+        color: const Color(0xFF4CAF50),
       ),
       _ThemeItem(
         id: TourContentType.culturalFacility,
         name: '문화시설',
-        icon: Icons.museum,
-        color: Colors.purple,
+        icon: Icons.account_balance,
+        color: const Color(0xFF9C27B0),
       ),
       _ThemeItem(
         id: TourContentType.festival,
         name: '축제/행사',
-        icon: Icons.festival,
-        color: Colors.orange,
+        icon: Icons.celebration,
+        color: const Color(0xFFFF9800),
       ),
       _ThemeItem(
         id: TourContentType.tourCourse,
         name: '여행코스',
-        icon: Icons.route,
-        color: Colors.blue,
+        icon: Icons.map,
+        color: const Color(0xFF2196F3),
       ),
       _ThemeItem(
         id: TourContentType.leisure,
         name: '레포츠',
-        icon: Icons.sports_tennis,
-        color: Colors.teal,
+        icon: Icons.sports_soccer,
+        color: const Color(0xFF009688),
       ),
       _ThemeItem(
         id: TourContentType.accommodation,
         name: '숙박',
-        icon: Icons.hotel,
-        color: Colors.indigo,
+        icon: Icons.bed,
+        color: const Color(0xFF3F51B5),
       ),
       _ThemeItem(
         id: TourContentType.shopping,
         name: '쇼핑',
-        icon: Icons.shopping_bag,
-        color: Colors.pink,
+        icon: Icons.shopping_cart,
+        color: const Color(0xFFE91E63),
       ),
       _ThemeItem(
         id: TourContentType.restaurant,
         name: '음식점',
-        icon: Icons.restaurant,
-        color: Colors.red,
+        icon: Icons.restaurant_menu,
+        color: const Color(0xFFF44336),
       ),
     ];
 
@@ -106,10 +106,11 @@ class ThemeFilterWidget extends StatelessWidget {
           Expanded(
             child: GridView.builder(
               scrollDirection: Axis.horizontal,
+              padding: EdgeInsets.zero,
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 1,
                 mainAxisSpacing: 12,
-                childAspectRatio: 1.2,
+                childAspectRatio: 0.95,
               ),
               itemCount: themes.length,
               itemBuilder: (context, index) {
@@ -140,50 +141,91 @@ class ThemeFilterWidget extends StatelessWidget {
                         width: isSelected ? 2 : 1,
                       ),
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(4),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Flexible(
-                            child: Container(
-                              padding: const EdgeInsets.all(6),
-                              decoration: BoxDecoration(
-                                color: isSelected
-                                    ? themeItem.color.withOpacity(0.2)
-                                    : theme.colorScheme.surfaceVariant,
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(
-                                themeItem.icon,
-                                size: 20,
-                                color: isSelected
-                                    ? themeItem.color
-                                    : theme.colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Flexible(
-                            child: FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: Text(
-                                themeItem.name,
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                                  color: isSelected
-                                      ? themeItem.color
-                                      : theme.colorScheme.onSurface,
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        // 사용 가능한 공간에 맞춰 크기 조정
+                        final availableHeight = constraints.maxHeight;
+                        final availableWidth = constraints.maxWidth;
+                        final iconSize = availableHeight > 80 ? 32.0 : availableHeight > 60 ? 26.0 : 22.0;
+                        final fontSize = availableHeight > 80 ? 12.0 : availableHeight > 60 ? 11.0 : 10.0;
+                        final spacing = availableHeight > 80 ? 6.0 : 4.0;
+                        final padding = availableHeight > 80 ? 6.0 : 4.0;
+                        
+                        return Padding(
+                          padding: EdgeInsets.all(padding),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              // 아이콘 컨테이너
+                              Expanded(
+                                child: Container(
+                                  width: double.infinity,
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                      colors: isSelected
+                                          ? [
+                                              themeItem.color.withOpacity(0.2),
+                                              themeItem.color.withOpacity(0.1),
+                                            ]
+                                          : [
+                                              theme.colorScheme.surfaceContainerHighest,
+                                              theme.colorScheme.surface,
+                                            ],
+                                    ),
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: isSelected
+                                          ? themeItem.color
+                                          : theme.colorScheme.outline.withOpacity(0.2),
+                                      width: isSelected ? 2.5 : 1.5,
+                                    ),
+                                    boxShadow: isSelected
+                                        ? [
+                                            BoxShadow(
+                                              color: themeItem.color.withOpacity(0.3),
+                                              blurRadius: 8,
+                                              offset: const Offset(0, 2),
+                                            ),
+                                          ]
+                                        : [],
+                                  ),
+                                  child: Center(
+                                    child: Icon(
+                                      themeItem.icon,
+                                      size: iconSize,
+                                      color: isSelected
+                                          ? themeItem.color
+                                          : theme.colorScheme.onSurfaceVariant,
+                                    ),
+                                  ),
                                 ),
-                                textAlign: TextAlign.center,
-                                maxLines: 1,
                               ),
-                            ),
+                              SizedBox(height: spacing),
+                              // 텍스트 레이블
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 2),
+                                child: Text(
+                                  themeItem.name,
+                                  style: TextStyle(
+                                    fontSize: fontSize,
+                                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                                    color: isSelected
+                                        ? themeItem.color
+                                        : theme.colorScheme.onSurface,
+                                    letterSpacing: -0.5,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
+                        );
+                      },
                     ),
                   ),
                 );

@@ -148,10 +148,7 @@ class _KTourHomeScreenState extends ConsumerState<KTourHomeScreen> {
                         subtitle: '추천 코스·나만의 코스',
                         color: Colors.green,
                         onTap: () {
-                          // TODO: 여행 코스 화면으로 이동
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('여행 코스 기능 준비중')),
-                          );
+                          context.push('/ktour/course');
                         },
                       ),
                       _buildMenuCard(

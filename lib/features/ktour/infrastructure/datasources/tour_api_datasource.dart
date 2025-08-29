@@ -3,6 +3,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/utils/logger.dart';
+import '../../domain/entities/tour_course.dart';
+import '../../domain/entities/course_step.dart';
 
 /// Tour API 4.0 DataSource
 /// 한국관광공사 Tour API와 통신하는 데이터 소스
@@ -315,36 +317,19 @@ class TourAPIDataSource {
   /// 공통 정보 조회 (상세 1)
   Future<Map<String, dynamic>> getDetailCommon({
     required String contentId,
-    String? contentTypeId,
-    bool defaultYN = true,
-    bool firstImageYN = true,
-    bool areacodeYN = true,
-    bool catcodeYN = true,
-    bool addrinfoYN = true,
-    bool mapinfoYN = true,
-    bool overviewYN = true,
   }) async {
     try {
       // 디버그 로그
       Log.d('=== Detail Common Request START ===');
       Log.d('Input contentId: "$contentId"');
-      Log.d('Input contentTypeId: "$contentTypeId"');
       
-      // 기본 파라미터 설정
-      final Map<String, dynamic> params = {};
-      
-      // 서비스 키 및 필수 파라미터 (공통)
-      final commonParams = _getCommonParams();
-      params.addAll(commonParams);
-      
-      // 필수: contentId
+      // 기본 파라미터 설정 - 최소 필수 파라미터만 사용
+      final params = _getCommonParams();
       params['contentId'] = contentId;
       
-      // detailCommon2 사용 - contentTypeId 파라미터 없이
-      // detailCommon2는 contentTypeId를 파라미터로 받지 않고 응답에 포함시킴
+      // detailCommon2 API 사용
+      // 필수 파라미터만 사용: serviceKey, MobileOS, MobileApp, _type, contentId
       String endpoint = '/detailCommon2';
-      
-      // detailCommon2에서는 YN 파라미터와 contentTypeId 모두 사용 안 함
       
       // 최종 파라미터 확인 (서비스 키 제외)
       Log.d('Final endpoint: $endpoint');
@@ -468,6 +453,244 @@ class TourAPIDataSource {
       Log.e('Failed to fetch pet tour info', error: e);
       rethrow;
     }
+  }
+
+  /// 여행코스 목록 조회
+  Future<List<TourCourse>> getTourCourses({
+    String? areaCode,
+    String? sigunguCode,
+    int pageNo = 1,
+    int numOfRows = 20,
+    String arrange = 'P', // P: 인기순
+  }) async {
+    if (_useDummyData) {
+      return _getDummyTourCourses();
+    }
+
+    try {
+      final params = _getCommonParams(pageNo: pageNo, numOfRows: numOfRows);
+      params['contentTypeId'] = TourContentType.tourCourse.toString();
+      params['arrange'] = arrange;
+
+      if (areaCode != null && areaCode.isNotEmpty) {
+        params['areaCode'] = areaCode;
+      }
+      if (sigunguCode != null && sigunguCode.isNotEmpty) {
+        params['sigunguCode'] = sigunguCode;
+      }
+
+      final response = await _dio.get('/areaBasedList2', queryParameters: params);
+      final items = _parseResponse(response);
+
+      return items.map((item) => _parseTourCourse(item)).toList();
+    } catch (e) {
+      Log.e('Failed to get tour courses', error: e);
+      if (e is TourAPIException) rethrow;
+      throw TourAPIException(
+        code: 'FETCH_ERROR',
+        message: 'Failed to fetch tour courses: $e',
+      );
+    }
+  }
+
+  /// 여행코스 상세 정보 조회
+  Future<TourCourse> getCourseDetail(String contentId) async {
+    if (_useDummyData) {
+      return _getDummyCourseDetail(contentId);
+    }
+
+    try {
+      // 기본 정보 조회
+      // detailCommon2 API - 최소 필수 파라미터만 사용
+      final commonParams = _getCommonParams();
+      commonParams['contentId'] = contentId;
+      // overviewYN 파라미터 제거 - API가 지원하지 않음
+
+      final commonResponse = await _dio.get('/detailCommon2', queryParameters: commonParams);
+      final commonItems = _parseResponse(commonResponse);
+      if (commonItems.isEmpty) {
+        throw TourAPIException(
+          code: 'NOT_FOUND',
+          message: 'Course not found: $contentId',
+        );
+      }
+
+      final course = _parseTourCourse(commonItems.first);
+
+      // 코스 단계 정보 조회
+      // detailInfo2 API는 contentTypeId가 필수
+      final detailParams = _getCommonParams();
+      detailParams['contentId'] = contentId;
+      detailParams['contentTypeId'] = '25';  // 여행코스 타입 ID (25)
+
+      final detailResponse = await _dio.get('/detailInfo2', queryParameters: detailParams);
+      final detailItems = _parseResponse(detailResponse);
+      
+      final steps = parseCourseSteps(detailItems);
+      final totalDistance = calculateCourseDistance(steps);
+      final totalDuration = calculateCourseDuration(steps);
+
+      return course.copyWith(
+        steps: steps,
+        totalDistance: totalDistance,
+        totalDuration: totalDuration,
+      );
+    } catch (e) {
+      Log.e('Failed to get course detail', error: e);
+      if (e is TourAPIException) rethrow;
+      throw TourAPIException(
+        code: 'FETCH_ERROR',
+        message: 'Failed to fetch course detail: $e',
+      );
+    }
+  }
+
+  /// 코스 단계별 정보 파싱
+  List<CourseStep> parseCourseSteps(List<Map<String, dynamic>> items) {
+    final steps = <CourseStep>[];
+    
+    for (final item in items) {
+      final infoname = item['infoname'] ?? '';
+      
+      // 코스 단계 정보만 파싱 (subcontentid가 있는 항목)
+      if (infoname.contains('코스') && item['subcontentid'] != null) {
+        steps.add(CourseStep(
+          subcontentid: item['subcontentid'] ?? '',
+          subname: item['subname'] ?? '',
+          subdetailimg: item['subdetailimg'],
+          subdetailoverview: item['subdetailoverview'],
+          subnum: int.tryParse(item['subnum']?.toString() ?? ''),
+        ));
+      }
+    }
+
+    // subnum으로 정렬
+    steps.sort((a, b) => (a.subnum ?? 0).compareTo(b.subnum ?? 0));
+    
+    return steps;
+  }
+
+  /// 코스 총 거리 계산
+  double calculateCourseDistance(List<CourseStep> steps) {
+    double totalDistance = 0;
+    for (final step in steps) {
+      totalDistance += step.distance ?? 0;
+    }
+    return totalDistance;
+  }
+
+  /// 코스 총 소요시간 계산
+  int calculateCourseDuration(List<CourseStep> steps) {
+    int totalDuration = 0;
+    for (final step in steps) {
+      totalDuration += step.duration ?? 0;
+    }
+    return totalDuration;
+  }
+
+  /// TourCourse 파싱
+  TourCourse _parseTourCourse(Map<String, dynamic> item) {
+    return TourCourse(
+      contentid: item['contentid'] ?? '',
+      contenttypeid: item['contenttypeid'] ?? TourContentType.tourCourse.toString(),
+      title: item['title'] ?? '',
+      firstimage: item['firstimage'],
+      firstimage2: item['firstimage2'],
+      addr1: item['addr1'],
+      addr2: item['addr2'],
+      areacode: item['areacode'],
+      sigungucode: item['sigungucode'],
+      cat1: item['cat1'],
+      cat2: item['cat2'],
+      cat3: item['cat3'],
+      mapx: double.tryParse(item['mapx']?.toString() ?? ''),
+      mapy: double.tryParse(item['mapy']?.toString() ?? ''),
+      overview: item['overview'],
+      tel: item['tel'],
+      zipcode: item['zipcode'],
+      createdtime: item['createdtime'] != null 
+        ? DateTime.tryParse(item['createdtime'].toString())
+        : null,
+      modifiedtime: item['modifiedtime'] != null
+        ? DateTime.tryParse(item['modifiedtime'].toString())
+        : null,
+      readcount: int.tryParse(item['readcount']?.toString() ?? ''),
+    );
+  }
+
+  /// 더미 여행코스 목록
+  List<TourCourse> _getDummyTourCourses() {
+    return [
+      const TourCourse(
+        contentid: '2549463',
+        contenttypeid: '25',
+        title: '서울 고궁 나들이 코스',
+        firstimage: 'https://tong.visitkorea.or.kr/cms/resource/21/2549421_image2_1.jpg',
+        addr1: '서울특별시 종로구',
+        overview: '경복궁, 창덕궁, 창경궁을 둘러보는 서울의 대표 고궁 투어 코스입니다.',
+        totalDistance: 8.5,
+        totalDuration: 360,
+        theme: '역사문화',
+        difficulty: '쉬움',
+      ),
+      const TourCourse(
+        contentid: '2549464',
+        contenttypeid: '25',
+        title: '북촌 한옥마을 문화 탐방',
+        firstimage: 'https://tong.visitkorea.or.kr/cms/resource/22/2549422_image2_1.jpg',
+        addr1: '서울특별시 종로구 북촌로',
+        overview: '전통 한옥과 현대 문화가 어우러진 북촌 일대를 탐방하는 코스입니다.',
+        totalDistance: 3.2,
+        totalDuration: 180,
+        theme: '문화예술',
+        difficulty: '보통',
+      ),
+    ];
+  }
+
+  /// 더미 코스 상세 정보
+  TourCourse _getDummyCourseDetail(String contentId) {
+    return TourCourse(
+      contentid: contentId,
+      contenttypeid: '25',
+      title: '서울 고궁 나들이 코스',
+      firstimage: 'https://tong.visitkorea.or.kr/cms/resource/21/2549421_image2_1.jpg',
+      addr1: '서울특별시 종로구',
+      overview: '경복궁, 창덕궁, 창경궁을 둘러보는 서울의 대표 고궁 투어 코스입니다.',
+      totalDistance: 8.5,
+      totalDuration: 360,
+      theme: '역사문화',
+      difficulty: '쉬움',
+      steps: [
+        const CourseStep(
+          subcontentid: '1',
+          subname: '경복궁',
+          subdetailimg: 'https://tong.visitkorea.or.kr/cms/resource/21/2549421_image2_1.jpg',
+          subdetailoverview: '조선왕조의 법궁으로 600년 역사를 간직한 궁궐',
+          subnum: 1,
+          distance: 0,
+          duration: 120,
+        ),
+        const CourseStep(
+          subcontentid: '2',
+          subname: '창덕궁',
+          subdetailimg: 'https://tong.visitkorea.or.kr/cms/resource/22/2549422_image2_1.jpg',
+          subdetailoverview: '유네스코 세계문화유산으로 지정된 아름다운 궁궐',
+          subnum: 2,
+          distance: 2.5,
+          duration: 90,
+        ),
+        const CourseStep(
+          subcontentid: '3',
+          subname: '창경궁',
+          subdetailimg: 'https://tong.visitkorea.or.kr/cms/resource/23/2549423_image2_1.jpg',
+          subdetailoverview: '동쪽 궁궐로 불리는 조선시대 별궁',
+          subnum: 3,
+          distance: 1.8,
+          duration: 90,
+        ),
+      ],
+    );
   }
 
   /// 응답 파싱

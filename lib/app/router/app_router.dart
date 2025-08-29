@@ -11,6 +11,8 @@ import '../../features/settings/presentation/screens/settings_screen.dart';
 import '../../features/ktour/presentation/screens/ktour_home_screen.dart';
 import '../../features/ktour/presentation/screens/tour_explore_screen.dart';
 import '../../features/ktour/presentation/screens/tour_detail_screen.dart';
+import '../../features/ktour/presentation/screens/tour_course_screen.dart';
+import '../../features/ktour/presentation/screens/course_detail_screen.dart';
 import '../../features/onboarding/presentation/screens/language_selection_screen.dart';
 import '../../features/splash/presentation/screens/splash_screen.dart';
 
@@ -23,6 +25,10 @@ abstract class AppRoutes {
   static const String ktour = '/ktour';
   static const String ktourExplore = '/ktour/explore';
   static const String ktourDetail = '/ktour/detail/:contentId';
+  static const String ktourCourse = '/ktour/course';
+  static const String courseDetail = '/ktour/course/:id';
+  static const String myCourse = '/ktour/my-course';
+  static const String courseCreate = '/ktour/course/create';
   static const String bookmarks = '/bookmarks';
   static const String settings = '/settings';
   static const String heritageDetail = '/heritage/:id';
@@ -103,6 +109,18 @@ final routerProvider = Provider<GoRouter>((ref) {
                 name: 'ktourExplore',
                 builder: (context, state) => const TourExploreScreen(),
               ),
+              // 여행코스 화면
+              GoRoute(
+                path: 'course',
+                name: 'ktourCourse',
+                builder: (context, state) => const TourCourseScreen(),
+              ),
+              // 나만의 코스 화면
+              GoRoute(
+                path: 'my-course',
+                name: 'myCourse',
+                builder: (context, state) => const TourCourseScreen(), // 탭 인덱스로 구분
+              ),
             ],
           ),
           
@@ -157,6 +175,30 @@ final routerProvider = Provider<GoRouter>((ref) {
           return TourDetailScreen(
             contentId: contentId,
             contentTypeId: contentTypeId,
+          );
+        },
+      ),
+      
+      // 코스 상세 화면 (전체 화면)
+      GoRoute(
+        path: AppRoutes.courseDetail,
+        name: 'courseDetail',
+        builder: (context, state) {
+          final contentId = state.pathParameters['id'] ?? '';
+          return CourseDetailScreen(contentId: contentId);
+        },
+      ),
+      
+      // 코스 생성 화면 (전체 화면)
+      GoRoute(
+        path: AppRoutes.courseCreate,
+        name: 'courseCreate',
+        builder: (context, state) {
+          // TODO: 코스 생성 화면 구현
+          return const Scaffold(
+            body: Center(
+              child: Text('코스 생성 화면 - 개발 중'),
+            ),
           );
         },
       ),
