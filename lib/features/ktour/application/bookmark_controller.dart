@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/utils/logger.dart';
 import '../domain/entities/bookmark_item.dart';
 import '../domain/entities/tour_attraction.dart';
+import '../domain/entities/tour_festival.dart';
 import '../domain/repositories/ktour_repository.dart';
 import '../infrastructure/repositories/ktour_repository_impl.dart';
 
@@ -128,6 +129,43 @@ class BookmarkController extends StateNotifier<BookmarkState> {
     }
   }
 
+  /// 축제 북마크 추가
+  Future<void> addBookmarkFromFestival(TourFestival festival) async {
+    if (_repository == null) return;
+    
+    try {
+      final bookmarkItem = BookmarkItem(
+        contentId: festival.contentId,
+        contentTypeId: 15, // 축제 타입 ID
+        title: festival.title,
+        address1: festival.address1,
+        address2: festival.address2,
+        mapX: festival.mapX,
+        mapY: festival.mapY,
+        firstImage: festival.firstImage,
+        firstImage2: festival.firstImage2,
+        tel: festival.tel,
+        overview: festival.overview,
+        bookmarkedAt: DateTime.now(),
+        bookmarkType: 'festival',
+      );
+      
+      await _repository!.saveBookmarkWithDetails(
+        bookmarkItem: bookmarkItem,
+      );
+      
+      // 목록 새로고침
+      await loadBookmarks();
+      
+      Log.d('Added festival bookmark: ${festival.contentId}');
+    } catch (e) {
+      Log.e('Failed to add festival bookmark', error: e);
+      state = state.copyWith(
+        error: '축제 북마크 추가에 실패했습니다',
+      );
+    }
+  }
+
   /// 북마크 토글
   Future<void> toggleBookmark(TourAttraction attraction) async {
     if (_repository == null) return;
@@ -138,6 +176,19 @@ class BookmarkController extends StateNotifier<BookmarkState> {
       await removeBookmark(attraction.contentId);
     } else {
       await addBookmarkFromAttraction(attraction);
+    }
+  }
+  
+  /// 축제 북마크 토글
+  Future<void> toggleFestivalBookmark(TourFestival festival) async {
+    if (_repository == null) return;
+    
+    final isBookmarked = await _repository!.isBookmarked(festival.contentId);
+    
+    if (isBookmarked) {
+      await removeBookmark(festival.contentId);
+    } else {
+      await addBookmarkFromFestival(festival);
     }
   }
 

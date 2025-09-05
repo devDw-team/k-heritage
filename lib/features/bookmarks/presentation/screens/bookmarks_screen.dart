@@ -23,13 +23,14 @@ class BookmarksScreen extends ConsumerWidget {
     final bookmarkedHeritages = <Heritage>[];
 
     return DefaultTabController(
-      length: 2,
+      length: 3,
       child: Scaffold(
         appBar: AppBar(
           title: const Text('북마크'),
           bottom: const TabBar(
             tabs: [
               Tab(text: '관광지'),
+              Tab(text: '행사/축제'),
               Tab(text: '문화재'),
             ],
           ),
@@ -37,7 +38,10 @@ class BookmarksScreen extends ConsumerWidget {
         body: TabBarView(
           children: [
             // 관광지 북마크 탭
-            _buildTourBookmarks(context, bookmarkState, bookmarkController),
+            _buildTourBookmarks(context, bookmarkState, bookmarkController, 'attraction'),
+            
+            // 행사/축제 북마크 탭
+            _buildTourBookmarks(context, bookmarkState, bookmarkController, 'festival'),
             
             // 문화재 북마크 탭
             _buildHeritageBookmarks(context, bookmarkedHeritages),
@@ -51,6 +55,7 @@ class BookmarksScreen extends ConsumerWidget {
     BuildContext context,
     BookmarkState state,
     BookmarkController controller,
+    String bookmarkType,
   ) {
     if (state.isLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -77,16 +82,21 @@ class BookmarksScreen extends ConsumerWidget {
       );
     }
     
-    if (state.bookmarks.isEmpty) {
-      return _buildEmptyState(isForTour: true);
+    // 타입별로 북마크 필터링
+    final filteredBookmarks = state.bookmarks
+        .where((bookmark) => bookmark.bookmarkType == bookmarkType)
+        .toList();
+    
+    if (filteredBookmarks.isEmpty) {
+      return _buildEmptyState(bookmarkType: bookmarkType);
     }
     
     return RefreshIndicator(
       onRefresh: controller.loadBookmarks,
       child: ListView.builder(
-        itemCount: state.bookmarks.length,
+        itemCount: filteredBookmarks.length,
         itemBuilder: (context, index) {
-          final bookmark = state.bookmarks[index];
+          final bookmark = filteredBookmarks[index];
           return TourBookmarkCard(
             key: ValueKey('${bookmark.contentId}_${bookmark.bookmarkedAt.millisecondsSinceEpoch}'),
             bookmark: bookmark,
@@ -121,7 +131,25 @@ class BookmarksScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildEmptyState({bool isForTour = true}) {
+  Widget _buildEmptyState({String? bookmarkType, bool isForTour = true}) {
+    String message;
+    if (bookmarkType != null) {
+      switch (bookmarkType) {
+        case 'attraction':
+          message = '관심 있는 관광지를 북마크에 추가해보세요';
+          break;
+        case 'festival':
+          message = '관심 있는 행사/축제를 북마크에 추가해보세요';
+          break;
+        default:
+          message = '관심 있는 항목을 북마크에 추가해보세요';
+      }
+    } else {
+      message = isForTour 
+        ? '관심 있는 관광지를 북마크에 추가해보세요'
+        : '관심 있는 문화재를 북마크에 추가해보세요';
+    }
+    
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -140,9 +168,7 @@ class BookmarksScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            isForTour 
-              ? '관심 있는 관광지를 북마크에 추가해보세요'
-              : '관심 있는 문화재를 북마크에 추가해보세요',
+            message,
             style: AppTypography.bodyMedium.copyWith(
               color: AppColors.grayMedium,
             ),

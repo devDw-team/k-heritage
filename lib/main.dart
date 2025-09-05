@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'core/config/app_config.dart';
 import 'core/utils/logger.dart';
 import 'app/router/app_router.dart';
@@ -41,6 +42,10 @@ void main() async {
 Future<SharedPreferences> _initializeApp() async {
   try {
     Log.i('Starting app initialization...');
+    
+    // Initialize date formatting for Korean locale
+    await initializeDateFormatting('ko_KR', null);
+    Log.d('Date formatting initialized for Korean locale');
     
     // Initialize SharedPreferences
     final prefs = await SharedPreferences.getInstance();

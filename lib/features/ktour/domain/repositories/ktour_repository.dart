@@ -75,6 +75,17 @@ abstract class KTourRepository {
     required String contentId,
   });
   
+  /// 축제 검색 (날짜 기반)
+  Future<List<TourFestival>> searchFestivals({
+    required String eventStartDate,
+    String? eventEndDate,
+    String? areaCode,
+    String? sigunguCode,
+    String? arrange,
+    int pageNo = 1,
+    int numOfRows = 20,
+  });
+  
   /// 숙박 시설 목록 조회
   Future<List<TourStay>> getStays({
     String? areaCode,

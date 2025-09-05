@@ -55,9 +55,13 @@ class TourBookmarkCard extends StatelessWidget {
         clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: () {
-            // 상세 화면으로 이동
-            context.push('/ktour/detail/${bookmark.contentId}', 
-              extra: {'contentTypeId': bookmark.contentTypeId});
+            // 북마크 타입에 따라 다른 경로로 이동
+            if (bookmark.bookmarkType == 'festival') {
+              context.push('/ktour/festival/${bookmark.contentId}');
+            } else {
+              context.push('/ktour/detail/${bookmark.contentId}', 
+                extra: {'contentTypeId': bookmark.contentTypeId});
+            }
           },
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -95,6 +99,15 @@ class TourBookmarkCard extends StatelessWidget {
                     // 제목
                     Row(
                       children: [
+                        // 축제 타입인 경우 아이콘 표시
+                        if (bookmark.bookmarkType == 'festival') ...[
+                          Icon(
+                            Icons.festival,
+                            size: 18,
+                            color: Colors.orange.shade700,
+                          ),
+                          const SizedBox(width: 8),
+                        ],
                         Expanded(
                           child: Text(
                             bookmark.title,

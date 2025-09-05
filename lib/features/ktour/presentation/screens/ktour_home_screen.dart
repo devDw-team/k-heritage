@@ -158,10 +158,7 @@ class _KTourHomeScreenState extends ConsumerState<KTourHomeScreen> {
                         subtitle: '지역별 축제·이벤트',
                         color: Colors.orange,
                         onTap: () {
-                          // TODO: 행사/축제 화면으로 이동
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('행사/축제 기능 준비중')),
-                          );
+                          context.push('/ktour/festival');
                         },
                       ),
                       _buildMenuCard(
@@ -427,10 +424,7 @@ class _KTourHomeScreenState extends ConsumerState<KTourHomeScreen> {
               ),
               TextButton(
                 onPressed: () {
-                  // TODO: 전체보기 - 축제 목록 화면으로 이동
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('축제 목록 화면 준비중')),
-                  );
+                  context.push('/ktour/festival');
                 },
                 child: const Text('전체보기'),
               ),
@@ -545,10 +539,7 @@ class _KTourHomeScreenState extends ConsumerState<KTourHomeScreen> {
           ],
         ),
         onTap: () {
-          // TODO: 축제 상세 화면으로 이동
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('${festival.title} 선택됨')),
-          );
+          context.push('/ktour/festival/${festival.contentId}');
         },
       ),
     );

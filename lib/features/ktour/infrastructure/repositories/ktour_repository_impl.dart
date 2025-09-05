@@ -379,6 +379,59 @@ class KTourRepositoryImpl implements KTourRepository {
   }
   
   @override
+  Future<List<TourFestival>> searchFestivals({
+    required String eventStartDate,
+    String? eventEndDate,
+    String? areaCode,
+    String? sigunguCode,
+    String? arrange,
+    int pageNo = 1,
+    int numOfRows = 20,
+  }) async {
+    try {
+      final cacheKey = _buildCacheKey('search_festivals', {
+        'startDate': eventStartDate,
+        'endDate': eventEndDate,
+        'area': areaCode,
+        'sigungu': sigunguCode,
+        'arrange': arrange,
+        'page': pageNo,
+      });
+      
+      // 캐시 확인
+      final cached = _getCachedList<TourFestival>(cacheKey);
+      if (cached != null) return cached;
+      
+      // API 호출
+      final results = await _tourAPI.searchFestival(
+        eventStartDate: eventStartDate,
+        eventEndDate: eventEndDate,
+        areaCode: areaCode,
+        sigunguCode: sigunguCode,
+        arrange: arrange,
+        pageNo: pageNo,
+        numOfRows: numOfRows,
+      );
+      
+      // TourFestival 객체로 변환
+      final festivals = results.map((item) {
+        var festival = TourFestival.fromApiResponse(item);
+        
+        // 북마크 상태는 별도로 확인 (성능을 위해 생략 가능)
+        return festival;
+      }).toList();
+      
+      // 캐시 저장
+      _cacheList(cacheKey, festivals);
+      
+      return festivals;
+    } catch (e) {
+      Log.e('Failed to search festivals', error: e);
+      return [];
+    }
+  }
+  
+  @override
   Future<List<TourStay>> getStays({
     String? areaCode,
     String? sigunguCode,

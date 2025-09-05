@@ -13,6 +13,9 @@ import '../../features/ktour/presentation/screens/tour_explore_screen.dart';
 import '../../features/ktour/presentation/screens/tour_detail_screen.dart';
 import '../../features/ktour/presentation/screens/tour_course_screen.dart';
 import '../../features/ktour/presentation/screens/course_detail_screen.dart';
+import '../../features/ktour/presentation/screens/festival_list_screen.dart';
+import '../../features/ktour/presentation/screens/festival_detail_screen.dart';
+import '../../features/ktour/presentation/screens/festival_calendar_screen.dart';
 import '../../features/onboarding/presentation/screens/language_selection_screen.dart';
 import '../../features/splash/presentation/screens/splash_screen.dart';
 
@@ -29,6 +32,8 @@ abstract class AppRoutes {
   static const String courseDetail = '/ktour/course/:id';
   static const String myCourse = '/ktour/my-course';
   static const String courseCreate = '/ktour/course/create';
+  static const String ktourFestival = '/ktour/festival';
+  static const String festivalDetail = '/ktour/festival/:id';
   static const String bookmarks = '/bookmarks';
   static const String settings = '/settings';
   static const String heritageDetail = '/heritage/:id';
@@ -120,6 +125,43 @@ final routerProvider = Provider<GoRouter>((ref) {
                 path: 'my-course',
                 name: 'myCourse',
                 builder: (context, state) => const TourCourseScreen(), // 탭 인덱스로 구분
+              ),
+              // 행사/축제 화면
+              GoRoute(
+                path: 'festival',
+                name: 'ktourFestival',
+                builder: (context, state) => const FestivalListScreen(),
+                routes: [
+                  // 축제 캘린더 화면 (특정 경로를 먼저 매칭)
+                  GoRoute(
+                    path: 'calendar',
+                    name: 'festivalCalendar',
+                    builder: (context, state) => const FestivalCalendarScreen(),
+                  ),
+                  // 축제 상세 화면 (동적 경로는 나중에 매칭)
+                  GoRoute(
+                    path: ':id',
+                    name: 'festivalDetail',
+                    builder: (context, state) {
+                      final contentId = state.pathParameters['id'] ?? '';
+                      return FestivalDetailScreen(contentId: contentId);
+                    },
+                    routes: [
+                      // 축제 지도 화면
+                      GoRoute(
+                        path: 'map',
+                        name: 'festivalMap',
+                        builder: (context, state) {
+                          // 부모 라우트에서 contentId 가져오기
+                          final contentId = state.pathParameters['id'] ?? '';
+                          // 실제 구현 시 festival 데이터를 가져와야 함
+                          // 여기서는 라우터 구조만 설정
+                          return Container(); // FestivalMapScreen으로 교체 필요
+                        },
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ],
           ),
