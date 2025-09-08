@@ -1,0 +1,88 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'tour_restaurant.dart';
+
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
+_$TourRestaurantImpl _$$TourRestaurantImplFromJson(Map<String, dynamic> json) =>
+    _$TourRestaurantImpl(
+      contentId: json['contentId'] as String,
+      contentTypeId: json['contentTypeId'] as String,
+      title: json['title'] as String,
+      address1: json['address1'] as String?,
+      address2: json['address2'] as String?,
+      areaCode: json['areaCode'] as String?,
+      sigunguCode: json['sigunguCode'] as String?,
+      cat1: json['cat1'] as String?,
+      cat2: json['cat2'] as String?,
+      cat3: json['cat3'] as String?,
+      firstImage: json['firstImage'] as String?,
+      firstImage2: json['firstImage2'] as String?,
+      mapX: (json['mapX'] as num?)?.toDouble(),
+      mapY: (json['mapY'] as num?)?.toDouble(),
+      tel: json['tel'] as String?,
+      zipCode: json['zipCode'] as String?,
+      firstMenu: json['firstMenu'] as String?,
+      treatMenu: json['treatMenu'] as String?,
+      openTime: json['openTime'] as String?,
+      openDateFood: json['openDateFood'] as String?,
+      restDate: json['restDate'] as String?,
+      parking: json['parking'] as String?,
+      kidsFacility: json['kidsFacility'] as String?,
+      smoking: json['smoking'] as String?,
+      packing: json['packing'] as String?,
+      infoCenter: json['infoCenter'] as String?,
+      scaleFoodPlace: json['scaleFoodPlace'] as String?,
+      seatFood: json['seatFood'] as String?,
+      reservationFood: json['reservationFood'] as String?,
+      discountInfo: json['discountInfo'] as String?,
+      creditCard: json['creditCard'] as String?,
+      lcnsNo: json['lcnsNo'] as String?,
+      distance: (json['distance'] as num?)?.toDouble(),
+      isBookmarked: json['isBookmarked'] as bool? ?? false,
+      createdTime: json['createdTime'] as String?,
+      modifiedTime: json['modifiedTime'] as String?,
+    );
+
+Map<String, dynamic> _$$TourRestaurantImplToJson(
+        _$TourRestaurantImpl instance) =>
+    <String, dynamic>{
+      'contentId': instance.contentId,
+      'contentTypeId': instance.contentTypeId,
+      'title': instance.title,
+      'address1': instance.address1,
+      'address2': instance.address2,
+      'areaCode': instance.areaCode,
+      'sigunguCode': instance.sigunguCode,
+      'cat1': instance.cat1,
+      'cat2': instance.cat2,
+      'cat3': instance.cat3,
+      'firstImage': instance.firstImage,
+      'firstImage2': instance.firstImage2,
+      'mapX': instance.mapX,
+      'mapY': instance.mapY,
+      'tel': instance.tel,
+      'zipCode': instance.zipCode,
+      'firstMenu': instance.firstMenu,
+      'treatMenu': instance.treatMenu,
+      'openTime': instance.openTime,
+      'openDateFood': instance.openDateFood,
+      'restDate': instance.restDate,
+      'parking': instance.parking,
+      'kidsFacility': instance.kidsFacility,
+      'smoking': instance.smoking,
+      'packing': instance.packing,
+      'infoCenter': instance.infoCenter,
+      'scaleFoodPlace': instance.scaleFoodPlace,
+      'seatFood': instance.seatFood,
+      'reservationFood': instance.reservationFood,
+      'discountInfo': instance.discountInfo,
+      'creditCard': instance.creditCard,
+      'lcnsNo': instance.lcnsNo,
+      'distance': instance.distance,
+      'isBookmarked': instance.isBookmarked,
+      'createdTime': instance.createdTime,
+      'modifiedTime': instance.modifiedTime,
+    };

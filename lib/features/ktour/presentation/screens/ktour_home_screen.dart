@@ -165,13 +165,10 @@ class _KTourHomeScreenState extends ConsumerState<KTourHomeScreen> {
                         context: context,
                         icon: Icons.info,
                         title: '여행 정보',
-                        subtitle: '맛집·숙박·교통',
+                        subtitle: '맛집·숙박·쇼핑',
                         color: Colors.purple,
                         onTap: () {
-                          // TODO: 여행 정보 화면으로 이동
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('여행 정보 기능 준비중')),
-                          );
+                          context.push('/ktour/travel-info');
                         },
                       ),
                     ],
@@ -317,9 +314,9 @@ class _KTourHomeScreenState extends ConsumerState<KTourHomeScreen> {
       margin: const EdgeInsets.only(right: 12),
       child: InkWell(
         onTap: () {
-          // TODO: 상세 화면으로 이동
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('${attraction.title} 선택됨')),
+          // 상세 화면으로 이동
+          context.push(
+            '/ktour/detail/${attraction.contentId}?contentTypeId=${attraction.contentTypeId}',
           );
         },
         borderRadius: BorderRadius.circular(12),

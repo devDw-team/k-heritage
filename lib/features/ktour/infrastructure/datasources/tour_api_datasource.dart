@@ -314,6 +314,92 @@ class TourAPIDataSource {
     }
   }
 
+  /// 맛집 정보 조회
+  Future<List<Map<String, dynamic>>> searchRestaurants({
+    String? areaCode,
+    String? sigunguCode,
+    String? keyword,
+    double? mapX,
+    double? mapY,
+    int? radius,
+    String? cat3, // 세부 분류 (한식/중식/일식 등)
+    String? arrange = 'C',
+    int pageNo = 1,
+    int numOfRows = 20,
+  }) async {
+    try {
+      // 위치 기반 검색
+      if (mapX != null && mapY != null) {
+        return await getLocationBasedList(
+          mapX: mapX,
+          mapY: mapY,
+          radius: radius ?? 5000,
+          contentTypeId: '39', // 음식점
+          arrange: 'E', // 거리순
+          pageNo: pageNo,
+          numOfRows: numOfRows,
+        );
+      }
+      
+      // 지역 기반 검색
+      return await getAreaBasedList(
+        areaCode: areaCode,
+        sigunguCode: sigunguCode,
+        contentTypeId: '39', // 음식점
+        cat3: cat3,
+        arrange: arrange,
+        pageNo: pageNo,
+        numOfRows: numOfRows,
+      );
+    } catch (e) {
+      Log.e('Failed to search restaurants', error: e);
+      rethrow;
+    }
+  }
+
+  /// 쇼핑 정보 조회
+  Future<List<Map<String, dynamic>>> searchShopping({
+    String? areaCode,
+    String? sigunguCode,
+    String? keyword,
+    double? mapX,
+    double? mapY,
+    int? radius,
+    String? cat3, // 세부 분류 (백화점/아울렛/전통시장 등)
+    String? arrange = 'C',
+    int pageNo = 1,
+    int numOfRows = 20,
+  }) async {
+    try {
+      // 위치 기반 검색
+      if (mapX != null && mapY != null) {
+        return await getLocationBasedList(
+          mapX: mapX,
+          mapY: mapY,
+          radius: radius ?? 5000,
+          contentTypeId: '38', // 쇼핑
+          arrange: 'E', // 거리순
+          pageNo: pageNo,
+          numOfRows: numOfRows,
+        );
+      }
+      
+      // 지역 기반 검색
+      return await getAreaBasedList(
+        areaCode: areaCode,
+        sigunguCode: sigunguCode,
+        contentTypeId: '38', // 쇼핑
+        cat3: cat3,
+        arrange: arrange,
+        pageNo: pageNo,
+        numOfRows: numOfRows,
+      );
+    } catch (e) {
+      Log.e('Failed to search shopping', error: e);
+      rethrow;
+    }
+  }
+
   /// 공통 정보 조회 (상세 1)
   Future<Map<String, dynamic>> getDetailCommon({
     required String contentId,

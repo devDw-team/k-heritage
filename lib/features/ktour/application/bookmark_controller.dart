@@ -198,6 +198,59 @@ class BookmarkController extends StateNotifier<BookmarkState> {
     return _repository!.isBookmarked(contentId);
   }
 
+  /// 범용 북마크 토글
+  Future<void> toggleBookmarkGeneric({
+    required String contentId,
+    required String contentTypeId,
+    required String title,
+    String? address,
+    String? imageUrl,
+  }) async {
+    if (_repository == null) return;
+    
+    final isCurrentlyBookmarked = await _repository!.isBookmarked(contentId);
+    
+    if (isCurrentlyBookmarked) {
+      await removeBookmark(contentId);
+    } else {
+      final bookmarkItem = BookmarkItem(
+        contentId: contentId,
+        contentTypeId: int.tryParse(contentTypeId) ?? 0,
+        title: title,
+        address1: address,
+        firstImage: imageUrl,
+        bookmarkedAt: DateTime.now(),
+        bookmarkType: _getBookmarkType(contentTypeId),
+      );
+      
+      await _repository!.saveBookmarkWithDetails(
+        bookmarkItem: bookmarkItem,
+      );
+      
+      // 목록 새로고침
+      await loadBookmarks();
+      
+      Log.d('Added bookmark: $contentId');
+    }
+  }
+
+  String _getBookmarkType(String contentTypeId) {
+    switch (contentTypeId) {
+      case '12':
+        return 'attraction';
+      case '15':
+        return 'festival';
+      case '32':
+        return 'accommodation';
+      case '39':
+        return 'restaurant';
+      case '38':
+        return 'shopping';
+      default:
+        return 'other';
+    }
+  }
+
   /// 북마크 검색
   List<BookmarkItem> searchBookmarks(String query) {
     if (query.isEmpty) return state.bookmarks;

@@ -16,6 +16,7 @@ import '../../features/ktour/presentation/screens/course_detail_screen.dart';
 import '../../features/ktour/presentation/screens/festival_list_screen.dart';
 import '../../features/ktour/presentation/screens/festival_detail_screen.dart';
 import '../../features/ktour/presentation/screens/festival_calendar_screen.dart';
+import '../../features/ktour/presentation/screens/travel_info_screen.dart';
 import '../../features/onboarding/presentation/screens/language_selection_screen.dart';
 import '../../features/splash/presentation/screens/splash_screen.dart';
 
@@ -34,6 +35,7 @@ abstract class AppRoutes {
   static const String courseCreate = '/ktour/course/create';
   static const String ktourFestival = '/ktour/festival';
   static const String festivalDetail = '/ktour/festival/:id';
+  static const String ktourTravelInfo = '/ktour/travel-info';
   static const String bookmarks = '/bookmarks';
   static const String settings = '/settings';
   static const String heritageDetail = '/heritage/:id';
@@ -125,6 +127,12 @@ final routerProvider = Provider<GoRouter>((ref) {
                 path: 'my-course',
                 name: 'myCourse',
                 builder: (context, state) => const TourCourseScreen(), // 탭 인덱스로 구분
+              ),
+              // 여행정보 화면
+              GoRoute(
+                path: 'travel-info',
+                name: 'ktourTravelInfo',
+                builder: (context, state) => const TravelInfoScreen(),
               ),
               // 행사/축제 화면
               GoRoute(
