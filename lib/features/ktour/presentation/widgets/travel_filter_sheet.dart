@@ -25,9 +25,9 @@ class _TravelFilterSheetState extends ConsumerState<TravelFilterSheet> {
     final theme = Theme.of(context);
 
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -49,11 +49,12 @@ class _TravelFilterSheetState extends ConsumerState<TravelFilterSheet> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   '필터',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.onSurface,
                   ),
                 ),
                 TextButton(
@@ -79,8 +80,17 @@ class _TravelFilterSheetState extends ConsumerState<TravelFilterSheet> {
                     spacing: 8,
                     children: SortBy.values.map((sortBy) {
                       return ChoiceChip(
-                        label: Text(sortBy.label),
+                        label: Text(
+                          sortBy.label,
+                          style: TextStyle(
+                            color: _filter.sortBy == sortBy
+                                ? theme.colorScheme.onPrimary
+                                : theme.colorScheme.onSurface,
+                          ),
+                        ),
                         selected: _filter.sortBy == sortBy,
+                        selectedColor: theme.colorScheme.primary,
+                        backgroundColor: theme.colorScheme.surfaceVariant,
                         onSelected: (selected) {
                           if (selected) {
                             setState(() {
@@ -212,7 +222,7 @@ class _TravelFilterSheetState extends ConsumerState<TravelFilterSheet> {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               border: Border(
-                top: BorderSide(color: Colors.grey[300]!),
+                top: BorderSide(color: theme.dividerColor),
               ),
             ),
             child: Row(
@@ -239,26 +249,39 @@ class _TravelFilterSheetState extends ConsumerState<TravelFilterSheet> {
   }
 
   Widget _buildSectionTitle(String title) {
+    final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Text(
         title,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.bold,
+          color: theme.colorScheme.onSurface,
         ),
       ),
     );
   }
 
   Widget _buildFilterChip(String label, String value, {bool isShop = false}) {
+    final theme = Theme.of(context);
     final isSelected = isShop
         ? _filter.shopType == value
         : _filter.foodType == value;
 
     return FilterChip(
-      label: Text(label),
+      label: Text(
+        label,
+        style: TextStyle(
+          color: isSelected
+              ? theme.colorScheme.onPrimary
+              : theme.colorScheme.onSurface,
+        ),
+      ),
       selected: isSelected,
+      selectedColor: theme.colorScheme.primary,
+      backgroundColor: theme.colorScheme.surfaceVariant,
+      checkmarkColor: theme.colorScheme.onPrimary,
       onSelected: (selected) {
         setState(() {
           if (isShop) {

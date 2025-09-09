@@ -418,15 +418,16 @@ class _TravelInfoScreenState extends ConsumerState<TravelInfoScreen>
   /// 필터 칩 빌드
   Widget _buildFilterChips(TravelInfoState state, TravelInfoController controller) {
     final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
     
     return Container(
       height: 50,
       padding: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
+        color: theme.colorScheme.surface.withOpacity(isDarkMode ? 0.95 : 1.0),
         border: Border(
           bottom: BorderSide(
-            color: theme.dividerColor.withOpacity(0.2),
+            color: theme.dividerColor.withOpacity(0.3),
             width: 1,
           ),
         ),
@@ -441,14 +442,22 @@ class _TravelInfoScreenState extends ConsumerState<TravelInfoScreen>
               style: TextStyle(
                 color: state.filter.maxDistance != null 
                     ? theme.colorScheme.onPrimary
-                    : theme.colorScheme.onSurface,
+                    : theme.colorScheme.onSurfaceVariant,
                 fontWeight: FontWeight.w500,
               ),
             ),
             selected: state.filter.maxDistance != null,
             selectedColor: theme.colorScheme.primary,
-            backgroundColor: theme.colorScheme.surfaceVariant,
+            backgroundColor: isDarkMode 
+                ? theme.colorScheme.surfaceVariant.withOpacity(0.3)
+                : theme.colorScheme.surfaceVariant,
             checkmarkColor: theme.colorScheme.onPrimary,
+            side: BorderSide(
+              color: state.filter.maxDistance != null
+                  ? theme.colorScheme.primary
+                  : theme.dividerColor,
+              width: 1,
+            ),
             onSelected: (selected) {
               controller.updateFilter(
                 state.filter.copyWith(maxDistance: selected ? 5.0 : null),
@@ -464,13 +473,21 @@ class _TravelInfoScreenState extends ConsumerState<TravelInfoScreen>
                     style: TextStyle(
                       color: state.filter.sortBy == sortBy
                           ? theme.colorScheme.onPrimary
-                          : theme.colorScheme.onSurface,
+                          : theme.colorScheme.onSurfaceVariant,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
                   selected: state.filter.sortBy == sortBy,
                   selectedColor: theme.colorScheme.primary,
-                  backgroundColor: theme.colorScheme.surfaceVariant,
+                  backgroundColor: isDarkMode 
+                      ? theme.colorScheme.surfaceVariant.withOpacity(0.3)
+                      : theme.colorScheme.surfaceVariant,
+                  side: BorderSide(
+                    color: state.filter.sortBy == sortBy
+                        ? theme.colorScheme.primary
+                        : theme.dividerColor,
+                    width: 1,
+                  ),
                   onSelected: (selected) {
                     if (selected) controller.changeSortBy(sortBy);
                   },

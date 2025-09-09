@@ -1,8 +1,10 @@
 import 'dart:math' as math;
 import '../../domain/entities/heritage.dart';
 import '../../domain/repositories/heritage_repository.dart';
+import '../../application/theme_classification_service.dart';
 import '../datasources/heritage_local_datasource.dart';
 import '../datasources/heritage_remote_datasource.dart';
+import '../data/theme_data.dart';
 
 class HeritageRepositoryImpl implements HeritageRepository {
   final HeritageLocalDataSource _localDataSource;
@@ -276,5 +278,122 @@ class HeritageRepositoryImpl implements HeritageRepository {
     }
     
     return cityCodes;
+  }
+  
+  @override
+  Future<List<Theme>> getAllThemes() async {
+    try {
+      // 먼저 모든 문화재를 가져와서 테마별 카운트 계산
+      final allHeritages = await getAllHeritages(); // 제한 없이 모든 문화재
+      final themeCounts = ThemeClassificationService.countHeritagesByTheme(allHeritages);
+      
+      // 테마 정보와 카운트를 결합하여 Theme 엔티티 생성
+      final themes = ThemeClassificationService.createThemesWithCounts(themeCounts);
+      
+      return themes;
+    } catch (e) {
+      throw Exception('Failed to get all themes: $e');
+    }
+  }
+  
+  @override
+  Future<List<Heritage>> getHeritagesByTheme(
+    String themeCode, {
+    String? lang,
+  }) async {
+    try {
+      // 테마 코드로 테마 키 찾기
+      String? themeKey;
+      for (final entry in ThemeData.themeMapping.entries) {
+        if (entry.value['code'] == themeCode) {
+          themeKey = entry.key;
+          break;
+        }
+      }
+      
+      if (themeKey == null) {
+        throw Exception('Invalid theme code: $themeCode');
+      }
+      
+      // 모든 문화재 가져오기 (로컬 우선, 없으면 원격)
+      final allHeritages = await getAllHeritages(lang: lang);
+      
+      // 테마별로 필터링
+      final themeHeritages = ThemeClassificationService.filterHeritagesByTheme(
+        allHeritages,
+        themeKey,
+      );
+      
+      return themeHeritages;
+    } catch (e) {
+      throw Exception('Failed to get heritages by theme: $e');
+    }
+  }
+  
+  @override
+  Future<Map<String, int>> getThemeCounts() async {
+    try {
+      final allHeritages = await getAllHeritages(); // 제한 없이 모든 문화재
+      return ThemeClassificationService.countHeritagesByTheme(allHeritages);
+    } catch (e) {
+      throw Exception('Failed to get theme counts: $e');
+    }
+  }
+  
+  @override
+  Future<List<Heritage>> getAllHeritages({
+    String? lang,
+    int? limit,
+  }) async {
+    try {
+      // 먼저 로컬에서 시도
+      var heritages = await _localDataSource.getAllHeritages(lang: lang);
+      
+      // 로컬에 데이터가 없거나 너무 적으면 원격에서 가져오기
+      if (heritages.isEmpty || heritages.length < 50) {
+        // 여러 주요 도시의 문화재 가져오기
+        final cityCodes = ['11', '31', '21', '22', '37', '36']; // 서울, 경기, 부산, 대구, 경북, 전남
+        final List<Heritage> remoteHeritages = [];
+        
+        for (final cityCode in cityCodes) {
+          try {
+            final cityHeritages = await _remoteDataSource.fetchHeritageList(
+              cityCode: cityCode,
+              pageSize: 100,
+              fetchImages: false, // 성능을 위해 이미지는 나중에
+            );
+            remoteHeritages.addAll(cityHeritages);
+            
+            // 제한이 있으면 확인
+            if (limit != null && remoteHeritages.length >= limit) {
+              break;
+            }
+          } catch (e) {
+            // 특정 도시 실패시 계속 진행
+            continue;
+          }
+        }
+        
+        // 로컬에 캐시
+        if (remoteHeritages.isNotEmpty) {
+          try {
+            await _localDataSource.upsertHeritages(remoteHeritages);
+          } catch (e) {
+            // 캐시 실패해도 계속 진행
+          }
+        }
+        
+        heritages = remoteHeritages;
+      }
+      
+      // 제한이 있으면 적용
+      if (limit != null && heritages.length > limit) {
+        heritages = heritages.take(limit).toList();
+      }
+      
+      return heritages;
+    } catch (e) {
+      throw Exception('Failed to get all heritages: $e');
+    }
   }
 }

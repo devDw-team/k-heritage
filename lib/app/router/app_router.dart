@@ -6,6 +6,7 @@ import '../../features/common/widgets/main_scaffold.dart';
 import '../../features/heritage/presentation/screens/detail_screen.dart';
 import '../../features/heritage/presentation/screens/home_screen.dart';
 import '../../features/heritage/presentation/screens/theme_screen.dart';
+import '../../features/heritage/presentation/screens/theme_heritage_list_screen.dart';
 import '../../features/bookmarks/presentation/screens/bookmarks_screen.dart';
 import '../../features/settings/presentation/screens/settings_screen.dart';
 import '../../features/ktour/presentation/screens/ktour_home_screen.dart';
@@ -26,6 +27,7 @@ abstract class AppRoutes {
   static const String languageSelection = '/language-selection';
   static const String home = '/home';
   static const String themes = '/themes';
+  static const String themeDetail = '/theme/:code';
   static const String ktour = '/ktour';
   static const String ktourExplore = '/ktour/explore';
   static const String ktourDetail = '/ktour/detail/:contentId';
@@ -192,6 +194,16 @@ final routerProvider = Provider<GoRouter>((ref) {
             ),
           ),
         ],
+      ),
+      
+      // 테마별 문화재 목록 화면 (전체 화면)
+      GoRoute(
+        path: AppRoutes.themeDetail,
+        name: 'themeDetail',
+        builder: (context, state) {
+          final themeCode = state.pathParameters['code'] ?? '';
+          return ThemeHeritageListScreen(themeCode: themeCode);
+        },
       ),
       
       // 문화재 상세 화면 (전체 화면)

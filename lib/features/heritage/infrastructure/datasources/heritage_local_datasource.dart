@@ -306,4 +306,60 @@ class HeritageLocalDataSource {
       throw Exception('Failed to search heritages: $e');
     }
   }
+  
+  Future<List<Heritage>> getAllHeritages({
+    String? lang = 'ko',
+    int? limit,
+  }) async {
+    try {
+      final effectiveLimit = limit ?? 1000; // 기본 제한
+      
+      final response = await _supabase
+          .from('heritage')
+          .select()
+          .limit(effectiveLimit);
+      
+      if (response == null || (response as List).isEmpty) {
+        return [];
+      }
+      
+      final heritages = (response as List).map((data) async {
+        // 이미지는 성능을 위해 기본적으로 가져오지 않음
+        // 필요한 경우 별도로 로드
+        return Heritage(
+          id: data['id'],
+          kdcd: data['kdcd'] ?? '',
+          ctcd: data['ctcd'] ?? '',
+          asno: data['asno'] ?? '',
+          nameKo: data['name_ko'],
+          nameHanja: data['name_hanja'],
+          nameEn: lang == 'en' ? data['name_en'] : null,
+          nameJa: lang == 'ja' ? data['name_ja'] : null,
+          nameZh: lang == 'zh' ? data['name_zh'] : null,
+          category: data['category'],
+          cityName: data['city_name'],
+          sigungu: data['sigungu'],
+          address: data['address'],
+          latitude: data['latitude']?.toDouble() ?? 0.0,
+          longitude: data['longitude']?.toDouble() ?? 0.0,
+          period: data['period'],
+          designatedDate: data['designated_date'] != null 
+            ? DateTime.parse(data['designated_date']) 
+            : null,
+          descriptionKo: data['description_ko'],
+          descriptionEn: lang == 'en' ? data['description_en'] : null,
+          descriptionJa: lang == 'ja' ? data['description_ja'] : null,
+          descriptionZh: lang == 'zh' ? data['description_zh'] : null,
+          admin: data['admin'],
+          mainImageUrl: data['main_image_url'],
+          images: [], // 성능을 위해 이미지는 나중에 로드
+        );
+      }).toList();
+      
+      return Future.wait(heritages);
+    } catch (e) {
+      // 로컬 데이터베이스 오류 시 빈 리스트 반환
+      return [];
+    }
+  }
 }

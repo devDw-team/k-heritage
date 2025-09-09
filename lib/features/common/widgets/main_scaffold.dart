@@ -43,7 +43,7 @@ class MainScaffold extends StatelessWidget {
           NavigationDestination(
             icon: Icon(Icons.home_outlined),
             selectedIcon: Icon(Icons.home),
-            label: '홈',
+            label: '문화재',
           ),
           NavigationDestination(
             icon: Icon(Icons.explore_outlined),
@@ -112,7 +112,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
                 index: 0,
                 icon: Icons.home_outlined,
                 selectedIcon: Icons.home,
-                label: '홈',
+                label: '문화재',
               ),
               _buildNavItem(
                 context: context,

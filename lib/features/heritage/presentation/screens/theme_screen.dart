@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../app/theme/app_theme.dart';
 import '../../../../app/theme/app_typography.dart';
+import '../../application/theme_controller.dart';
+import '../../infrastructure/data/theme_data.dart' as heritage_theme_data;
 
 /// 테마 탐방 화면
 class ThemeScreen extends ConsumerWidget {
@@ -12,56 +14,65 @@ class ThemeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final themeState = ref.watch(themeControllerProvider);
+    
+    // ThemeData에서 테마 정보를 기반으로 리스트 생성하고 실제 카운트 사용
     final themes = [
-      ThemeItem(
-        icon: '👑',
-        title: '궁궐 탐방',
-        subtitle: '조선의 왕실 문화',
-        count: 5,
-        color: AppColors.dancheongRed,
-        description: '경복궁, 창덕궁, 창경궁 등',
-      ),
-      ThemeItem(
-        icon: '🗺️',
-        title: '세계유산',
-        subtitle: 'UNESCO 등재 문화재',
-        count: 14,
-        color: AppColors.obangBlue,
-        description: '석굴암, 해인사, 종묘 등',
-      ),
-      ThemeItem(
-        icon: '🏘️',
-        title: '전통마을',
-        subtitle: '한옥과 고택의 정취',
-        count: 7,
-        color: AppColors.celadonGreen,
-        description: '안동 하회마을, 양동마을 등',
-      ),
-      ThemeItem(
-        icon: '🛕',
-        title: '불교 문화재',
-        subtitle: '사찰과 불탑',
-        count: 23,
-        color: const Color(0xFF9C27B0),
-        description: '불국사, 통도사, 해인사 등',
-      ),
-      ThemeItem(
-        icon: '🗿',
-        title: '산성과 성곽',
-        subtitle: '방어 유적지',
-        count: 9,
-        color: const Color(0xFF795548),
-        description: '화성, 남한산성, 북한산성 등',
-      ),
-      ThemeItem(
-        icon: '🎭',
-        title: '무형문화재',
-        subtitle: '전통 기예와 문화',
-        count: 15,
-        color: AppColors.intangibleHeritage,
-        description: '판소리, 농악, 탈춤 등',
-      ),
-    ];
+            ThemeItem(
+              icon: 'palace',
+              title: '궁궐 탐방',
+              subtitle: '조선의 왕실 문화',
+              count: themeState.themeCounts['palace'] ?? 0,
+              color: AppColors.dancheongRed,
+              description: '경복궁, 창덕궁, 창경궁 등',
+              code: 'TH001',
+            ),
+            ThemeItem(
+              icon: 'public',
+              title: '세계유산',
+              subtitle: 'UNESCO 등재 문화재',
+              count: themeState.themeCounts['unesco'] ?? 0,
+              color: AppColors.obangBlue,
+              description: '석굴암, 해인사, 종묘 등',
+              code: 'TH002',
+            ),
+            ThemeItem(
+              icon: 'holiday_village',
+              title: '전통마을',
+              subtitle: '한옥과 고택의 정취',
+              count: themeState.themeCounts['village'] ?? 0,
+              color: AppColors.celadonGreen,
+              description: '안동 하회마을, 양동마을 등',
+              code: 'TH003',
+            ),
+            ThemeItem(
+              icon: 'temple_buddhist',
+              title: '불교 문화재',
+              subtitle: '사찰과 불탑',
+              count: themeState.themeCounts['buddhist'] ?? 0,
+              color: const Color(0xFF9C27B0),
+              description: '불국사, 통도사, 해인사 등',
+              code: 'TH004',
+            ),
+            ThemeItem(
+              icon: 'castle',
+              title: '산성과 성곽',
+              subtitle: '방어 유적지',
+              count: themeState.themeCounts['fortress'] ?? 0,
+              color: const Color(0xFF795548),
+              description: '화성, 남한산성, 북한산성 등',
+              code: 'TH005',
+            ),
+            ThemeItem(
+              icon: 'theater_comedy',
+              title: '무형문화재',
+              subtitle: '전통 기예와 문화',
+              count: themeState.themeCounts['intangible'] ?? 0,
+              color: AppColors.intangibleHeritage,
+              description: '판소리, 농악, 탈춤 등',
+              code: 'TH006',
+            ),
+          ];
 
     return Scaffold(
       appBar: AppBar(
@@ -127,96 +138,18 @@ class ThemeScreen extends ConsumerWidget {
                 return _ThemeCard(
                   theme: theme,
                   onTap: () {
-                    // TODO: 테마별 문화재 리스트 화면으로 이동
+                    // 테마별 문화재 리스트 화면으로 이동
+                    context.push('/theme/${theme.code}');
                   },
                 );
               },
             ),
-            
-            const SizedBox(height: 32),
-            
-            // 이달의 추천 코스
-            _buildRecommendedCourse(context),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildRecommendedCourse(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppColors.hanjiBeige,
-        borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '이달의 추천 코스',
-            style: AppTypography.h5,
-          ),
-          const SizedBox(height: 16),
-          InkWell(
-            onTap: () {
-              // TODO: 추천 코스 상세 화면으로 이동
-            },
-            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-            child: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: AppColors.surface,
-                borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 60,
-                    height: 60,
-                    decoration: BoxDecoration(
-                      color: AppColors.dancheongRed,
-                      borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                    ),
-                    child: const Center(
-                      child: Text(
-                        '🌸',
-                        style: TextStyle(fontSize: 28),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '봄꽃과 함께하는 궁궐 나들이',
-                          style: AppTypography.h6,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          '창덕궁, 창경궁, 덕수궁',
-                          style: AppTypography.bodySmall.copyWith(
-                            color: AppColors.grayMedium,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const Icon(
-                    Icons.arrow_forward_ios,
-                    size: 16,
-                    color: AppColors.grayMedium,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 /// 테마 카드 위젯
@@ -229,25 +162,25 @@ class _ThemeCard extends StatelessWidget {
     this.onTap,
   });
   
-  Widget _getThemeIcon(String title) {
+  Widget _getThemeIcon(String iconName) {
     IconData iconData;
-    switch (title) {
-      case '궁궐 탐방':
+    switch (iconName) {
+      case 'palace':
         iconData = Icons.account_balance;
         break;
-      case '세계유산':
+      case 'public':
         iconData = Icons.public;
         break;
-      case '전통마을':
+      case 'holiday_village':
         iconData = Icons.holiday_village;
         break;
-      case '불교 문화재':
+      case 'temple_buddhist':
         iconData = Icons.temple_buddhist;
         break;
-      case '산성과 성곽':
+      case 'castle':
         iconData = Icons.castle;
         break;
-      case '무형문화재':
+      case 'theater_comedy':
         iconData = Icons.theater_comedy;
         break;
       default:
@@ -323,7 +256,7 @@ class _ThemeCard extends StatelessWidget {
                   ),
                 ),
                 child: Center(
-                  child: _getThemeIcon(theme.title),
+                  child: _getThemeIcon(theme.icon),
                 ),
               ),
               const SizedBox(height: 16),
@@ -398,6 +331,7 @@ class ThemeItem {
   final String description;
   final int count;
   final Color color;
+  final String code;
 
   const ThemeItem({
     required this.icon,
@@ -406,5 +340,6 @@ class ThemeItem {
     required this.description,
     required this.count,
     required this.color,
+    required this.code,
   });
 }

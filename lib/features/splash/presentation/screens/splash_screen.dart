@@ -75,8 +75,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     await Future.delayed(const Duration(seconds: 3));
     
     if (mounted) {
-      // 홈 화면으로 이동
-      context.go('/home');
+      // K-Tour 화면으로 이동
+      context.go('/ktour');
     }
   }
 

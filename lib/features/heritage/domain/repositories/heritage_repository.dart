@@ -25,4 +25,19 @@ abstract class HeritageRepository {
     required double longitude,
     required double radiusKm,
   });
+  
+  // 테마 관련 메서드
+  Future<List<Theme>> getAllThemes();
+  
+  Future<List<Heritage>> getHeritagesByTheme(
+    String themeCode, {
+    String? lang,
+  });
+  
+  Future<Map<String, int>> getThemeCounts();
+  
+  Future<List<Heritage>> getAllHeritages({
+    String? lang,
+    int? limit,
+  });
 }
